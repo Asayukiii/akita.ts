@@ -15,7 +15,7 @@ export class API extends TypedEmitter<Events> {
         this.port = options.port
         this.app = express()
         this.routes = new Endpoints(this.app)
-        this.interpreter = new Interpreter(this.app)
+        this.interpreter = new Interpreter(this.app, this.routes)
     }
     setSpaces(howm: number): void {
         let n = Number(howm)

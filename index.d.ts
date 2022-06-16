@@ -26,6 +26,7 @@ export interface Data {
     break: boolean
     unpack: (d: Data) => UnpackedFunction
     _: Record<string, any>
+    routes: Endpoints
 }
 
 export interface UnpackedFunction {

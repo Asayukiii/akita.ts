@@ -22,7 +22,7 @@ export class Endpoints {
 
         this.routes[this.routes.length] = route
     }
-    async loadWithCache(dir: string): Promise<void> {
+    private async loadWithCache(dir: string): Promise<void> {
         let mdir = process.cwd()
         let modules = readdirSync(join(mdir, dir))
         for(const file of modules) {
@@ -31,10 +31,12 @@ export class Endpoints {
             let route = require(join(mdir, dir, file))
             route = !route?.path && route?.default?.path ? route.default: route
             if(!route?.path || !route?.code) { Utils.Warn('Invalid route at:', join(dir, file)); continue }
+            delete require.cache[require(join(mdir, dir, file))]
             this.add(route)
         }
     }
     async load(dir: string): Promise<void> {
+        this.routes = []
         if(!dir || typeof dir !== 'string') throw new SyntaxError('Invalid path provided.')
         this.loadWithCache(dir).catch((e) => {
             Utils.Warn(`Failed to load path with reason: ${e}. at:`, `load(${dir})`)

@@ -1,13 +1,15 @@
 import { Application, Request, Response } from "express";
-import { SourceFunction, UnpackedFunction, Data } from "../../index";
+import { SourceFunction, UnpackedFunction, Data, Endpoints } from "../../index";
 import fs from 'fs'
 
 export class Interpreter {
     public functions: SourceFunction[]
     public app: Application
-    constructor(app: Application) {
+    public routes: Endpoints
+    constructor(app: Application, routes: Endpoints) {
         this.functions = []
         this.app = app
+        this.routes = routes
         this.load()
     }
     private unpack(d: Data): UnpackedFunction {
@@ -28,7 +30,8 @@ export class Interpreter {
             req,
             res,
             break: false,
-            _: {}
+            _: {},
+            routes: this.routes
         }
         let funcs = data.code.split('$')
         data.code = funcs.join('$')
