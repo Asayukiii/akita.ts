@@ -13,11 +13,13 @@ export const data: SourceFunction = {
         let [ status, type, body ] = r.splits
         if(!Utils.isNumber(status)) return Utils.Warn('Invalid status provided in:', d.func)
         if(type.toLowerCase() === 'json') {
-            if(!Utils.isValidJSON(body)) return Utils.Warn('Invalid JSON provided in:', d.func)
-            let json = JSON.parse(body)
+            if(!Utils.isValidJSON(body.unescape()!)) return Utils.Warn('Invalid JSON provided in:', d.func)
+            let json = JSON.parse(body.unescape()!)
             d.res.status(parseInt(status)).json(json)
         } else if(type.toLowerCase() === 'safe') {
             let b = d._.object
+            if(!b) return Utils.Warn('No object was found, create one first. In:', d.func)
+            b = JSON.parse(JSON.stringify(b).unescape()!)
             d.res.status(parseInt(status)).json(b)
         }
         return {

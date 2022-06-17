@@ -66,6 +66,30 @@ export class Interpreter {
             let last = p_s.pop()
             return p_s.join(w) + r + last
         }
+        String.prototype.unescape = function() {
+            return this
+            .replaceAll('@left', ']')
+            .replaceAll('@right', '[')
+            .replaceAll('@semi', ';')
+            .replaceAll('@colon', ':')
+            .replaceAll('@equal', '=')
+            .replaceAll('@or', '||')
+            .replaceAll('@and', '&&')
+            .replaceAll('@higher', '>')
+            .replaceAll('@lower', '<')
+        }
+        String.prototype.escape = function() {
+            return this
+            .replaceAll(']', '@left')
+            .replaceAll('[', '@right')
+            .replaceAll(';', '@semi')
+            .replaceAll(':', '@colon')
+            .replaceAll('=', '@equal')
+            .replaceAll('||', '@or')
+            .replaceAll('&&', '@and')
+            .replaceAll('>', '@higher')
+            .replaceAll('<', '@lower')
+        }
         String.prototype.after = function () {
             const afterIndex = this.indexOf("[");
             const after = this.replace(/(\s|\n)/gim, "").startsWith("[")

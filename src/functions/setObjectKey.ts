@@ -12,7 +12,7 @@ export const data: SourceFunction = {
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         if(r.splits.length < 2) return Utils.Warn('Invalid fields provided in:', d.func)
         if(!obj) return Utils.Warn('No object created found. Use $createObject first. Error at:', d.func)
-        obj[r.splits[0]] = r.splits[1]
+        obj[r.splits[0]] = r.splits[1].escape()
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')
         }

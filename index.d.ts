@@ -96,5 +96,7 @@ declare global {
          */
         resolve(What: string, Replacement: string): string
         after(): string | null
+        escape(): string | null
+        unescape(): string | null
     }
 }

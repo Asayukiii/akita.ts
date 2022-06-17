@@ -9,7 +9,7 @@ export const data: SourceFunction = {
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
-        console.log(r.inside)
+        console.log(r.inside.unescape())
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')
         }

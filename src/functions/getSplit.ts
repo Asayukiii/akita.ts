@@ -4,13 +4,14 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('uppercase')
-    .setValue('description', 'Convert a string to uppercase.'),
+    .setName('getSplit')
+    .setValue('description', 'Get an element from splits.'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
+        if(!Utils.isNumber(r.inside)) return Utils.Warn('Invalid indexprovided in:', d.func)
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, r.inside.toUpperCase().escape()!)
+            code: d.code.resolve(`${d.func}[${r.inside}]`, d._.splits?.[Number(r.inside) - 1] || 'undefined')
         }
     }
 }

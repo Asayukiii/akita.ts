@@ -1,5 +1,5 @@
-import {FunctionBuilder} from '../classes/builder';
-import {SourceFunction} from '../../index';
+import { FunctionBuilder } from '../classes/builder';
+import { SourceFunction } from '../../index';
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()

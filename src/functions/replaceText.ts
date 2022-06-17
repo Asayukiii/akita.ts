@@ -12,7 +12,7 @@ export const data: SourceFunction = {
         if(r.splits.length < 3) return Utils.Warn('Invalid fields provided in:', d.func)
         let [ text, x, y, strict = 'yes' ] = r.splits
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, Utils.booleanify(strict) ? text.replaceAll(x, y): text.replace(x, y))
+            code: d.code.resolve(`${d.func}[${r.inside}]`, Utils.booleanify(strict) ? text.unescape()!.replaceAll(x.unescape()!, y.unescape()!).escape()!: text.unescape()!.replace(x.unescape()!, y.unescape()!).escape()!)
         }
     }
 }

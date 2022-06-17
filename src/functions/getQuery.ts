@@ -11,7 +11,7 @@ export const data: SourceFunction = {
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         let result = d.req.query[r.inside]?.toString()
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, result || 'undefined')
+            code: d.code.resolve(`${d.func}[${r.inside}]`, result?.escape() || 'undefined')
         }
     }
 }
