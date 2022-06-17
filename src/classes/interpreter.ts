@@ -38,7 +38,7 @@ export class Interpreter {
         for(let i = funcs.length - 1; i > 0; i--) {
             if(data.break) break;
             let split = "$" + funcs[i]
-            let name = split.split('$')[1]?.split('[')?.[0]?.trim()?.toLowerCase()
+            let name = split.split('$')[1]?.split('[')?.[0]?.trim()?.replace(']', '')?.toLowerCase()
             let func = this.functions.find(f => name == f.data.name.toLowerCase())
             if(!func) continue;
             data.func = '$'+ func.data.name.toLowerCase()
