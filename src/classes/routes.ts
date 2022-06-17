@@ -19,7 +19,6 @@ export class Endpoints {
         if(!route.path || typeof route.path !== 'string') throw new SyntaxError('Invalid path route provided.')
         if(!route.code || typeof route.path !== 'string') throw new SyntaxError('Invalid call string provided.')
         if(route.details && typeof route.details !== 'object') throw new SyntaxError('Invalid extra object provided.')
-
         this.routes[this.routes.length] = route
     }
     private async loadWithCache(dir: string): Promise<void> {
@@ -36,7 +35,6 @@ export class Endpoints {
         }
     }
     async load(dir: string): Promise<void> {
-        this.routes = []
         if(!dir || typeof dir !== 'string') throw new SyntaxError('Invalid path provided.')
         this.loadWithCache(dir).catch((e) => {
             Utils.Warn(`Failed to load path with reason: ${e}. at:`, `load(${dir})`)

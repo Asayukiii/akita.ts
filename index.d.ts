@@ -71,7 +71,7 @@ export class Endpoints {
      * @example
      * <API>.routes.load('./routes')
      */
-    public load(dir: string): void
+    public async load(dir: string): Promise<void>
 }
 
 export class API extends TypedEmitter<Events> {
