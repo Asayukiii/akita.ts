@@ -12,8 +12,7 @@ export const Utils = {
         console.log(`${colors.yellow(">> WARNING!!")} ${colors.red(error)} ${colors.cyan(data)}`)
     },
     isNumber(num: string): boolean {
-        let n = num.match(/[0-9]/g)
-        return n ? true: false
+        return num.replace(/[^0-9]/g, '').trim() ? true: false
     },
     booleanify(str: string): boolean {
         let r;
