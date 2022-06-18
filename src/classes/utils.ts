@@ -1,4 +1,5 @@
 import colors from "colors/safe"
+import Hjson from "hjson"
 
 const equal = (str: string) => str.split('==')[0] == str.split('==')[1]
 const not_equal = (str: string) => str.split('!=')[0] != str.split('!=')[1]
@@ -39,11 +40,12 @@ export const Utils = {
             return null
         }
     },
-    isValidJSON(json: string): boolean {
+    loadObject(json: string): Record<string, any> | null {
         try {
-            return JSON.parse(json) ? true: false
+            let r = Hjson.parse(json)
+            return typeof r === 'object' ? r: null
         } catch {
-            return false
+            return null
         }
     }
 }

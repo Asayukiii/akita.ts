@@ -15,9 +15,9 @@ export const data: SourceFunction = {
         let result = Utils.condition(condition)
         if(result === null) return Utils.Warn('Invalid condition provided in:', d.func)
         if(result) {
-            if(!Utils.isValidJSON(body.escape()!)) Utils.Warn('Invalid JSON provided in:', d.func)
-            let json = JSON.parse(body.escape()!)
-            d.res.status(parseInt(status)).json(json)
+            let obj = Utils.loadObject(body.unescape()!)
+            if(!obj) Utils.Warn('Invalid JSON provided in:', d.func)
+            d.res.status(parseInt(status)).json(obj)
             d.break = true
         }
         return {

@@ -4,13 +4,14 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('isNumber')
-    .setValue('description', 'Check if this is a valid number.'),
+    .setName('isImage')
+    .setValue('description', 'Check if an image was loaded.'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
+        let v = d._.Images?.[r.inside]
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, Utils.isNumber(r.inside).toString())
+            code: d.code.resolve(`${d.func}[${r.inside}]`, v?.src ? 'true': 'false')
         }
     }
 }

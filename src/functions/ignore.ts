@@ -4,13 +4,13 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('createObject')
-    .setValue('description', 'Create an original object.'),
+    .setName('ignore')
+    .setValue('description', 'Just ignore this code.'),
     code: async d => {
-        let obj: Record<string, any> = {}
-        d._.object = obj
+        let r = d.unpack(d)
+        if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         return {
-            code: d.code.resolve(`${d.func}`, '')
+            code: d.code.resolve(`${d.func}[${r.inside}]`, '')
         }
     }
 }
