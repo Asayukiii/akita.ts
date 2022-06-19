@@ -25,10 +25,8 @@
     "dependencies": {
         "@napi-rs/canvas": "^0.1.22",
         "axios": "^0.23.0",
-        "canvas": "^2.9.1",
         "colors": "^1.4.0",
         "express": "^4.18.1",
-        "hjson": "^3.2.2",
-        "undici": "^5.5.1"
+        "hjson": "^3.2.2"
     }
 }

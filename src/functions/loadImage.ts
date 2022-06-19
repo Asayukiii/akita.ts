@@ -2,8 +2,8 @@ import { FunctionBuilder } from "../classes/builder";
 import { SourceFunction } from "../../index";
 import { Utils } from "../classes/utils";
 import { readFile } from "fs/promises";
-import { request } from "undici";
 import Canvas from "@napi-rs/canvas";
+import axios from "axios";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -23,9 +23,10 @@ export const data: SourceFunction = {
             if(!file) return Utils.Warn('Invalid image path provided in:', d.func)
             img.src = file
         } else if(type.toLowerCase() === 'url' || type.toLowerCase() === 'link') {
-            const file = await request(body.unescape()!.replace('.webp', '.png')).catch(e=>null)
-            if(file) {
-                img.src = Buffer.from(await file.body.arrayBuffer())
+            const file = await axios.get(body.unescape()!.replace('.webp', '.png'), { responseType: 'arraybuffer' }).catch(e=>null)
+            const data: any = file ? (await file.data): null
+            if(data) {
+                img.src = data
             } else {
                 loaded = false
             }
