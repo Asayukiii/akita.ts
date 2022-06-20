@@ -1,8 +1,8 @@
 {
     "name": "easy-api.ts",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "description": "Make your own API with ease.",
-    "main": "dist/index.js",
+    "main": "dist/main.js",
     "types": "index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
