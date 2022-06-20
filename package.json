@@ -9,7 +9,7 @@
         "compile": "node node_modules/typescript/lib/tsc.js -w",
         "run": "node ./dist/tests/main"
     },
-    "keywords": [],
+    "keywords": ["aoi.js", "api", "express", "bdfd", "easy-api", "ea.ts"],
     "author": "",
     "license": "ISC",
     "devDependencies": {
