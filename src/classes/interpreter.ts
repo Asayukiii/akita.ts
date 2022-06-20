@@ -1,5 +1,6 @@
 import { Application, Request, Response } from "express";
 import { SourceFunction, UnpackedFunction, Data, Endpoints } from "../../index";
+import { join } from "path";
 import fs from 'fs'
 
 export class Interpreter {
@@ -55,7 +56,7 @@ export class Interpreter {
         this.functions[this.functions.length] = func
     }
     private load(): void {
-        let dirs = fs.readdirSync('./dist/functions')
+        let dirs = fs.readdirSync(join(process.cwd(), './node_modules/easy-api.ts/dist/functions'))
         for(const file of dirs) {
             const r: SourceFunction | undefined = require(`../functions/${file}`).data
             if(!r) continue;
