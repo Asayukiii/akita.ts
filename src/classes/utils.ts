@@ -1,3 +1,4 @@
+import { SKRSContext2D } from "@napi-rs/canvas"
 import colors from "colors/safe"
 import Hjson from "hjson"
 
@@ -47,6 +48,23 @@ export const Utils = {
         } catch {
             return null
         }
+    },
+    isValidHex(str: string): boolean {
+        if(!str) return false
+        return /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(str.replace(/(#)/g, ''))
+    },
+    molde(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, radius: number): void {
+        ctx.beginPath()
+		ctx.moveTo(x + radius, y)
+		ctx.lineTo(x + width - radius, y)
+		ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
+		ctx.lineTo(x + width, y + height - radius)
+		ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
+		ctx.lineTo(x + radius, y + height)
+		ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
+		ctx.lineTo(x, y + radius)
+		ctx.quadraticCurveTo(x, y, x + radius, y)
+		ctx.closePath()
     }
 }
 

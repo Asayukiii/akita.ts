@@ -1,7 +1,7 @@
 {
     "name": "easy-api.ts",
-    "version": "0.10.5",
-    "description": "Make your own API with ease.",
+    "version": "0.10.9",
+    "description": "Make your own API with ease",
     "main": "dist/main.js",
     "types": "index.d.ts",
     "scripts": {

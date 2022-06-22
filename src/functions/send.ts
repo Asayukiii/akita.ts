@@ -21,11 +21,15 @@ export const data: SourceFunction = {
             if(!b) return Utils.Warn('No object was found, create one first. In:', d.func)
             b = JSON.parse(JSON.stringify(b).unescape()!)
             d.res.status(parseInt(status)).json(b)
-        } else if(type === 'canvas') {
+        } else if(type.toLowerCase() === 'canvas') {
             let canvas = d._.Canvas?.canvas
             if(!canvas) return Utils.Warn('No canvas was found, create one first. In:', d.func)
             d.res.set('Content-Type', aggent || 'image/png')
             d.res.status(parseInt(status)).send(canvas.toBuffer(aggent || 'image/png'))
+        } else if(type.toLowerCase() === 'file') {
+            d.res.status(parseInt(status)).sendFile(body)
+        } else if(type.toLowerCase() === 'other') {
+            d.res.status(parseInt(status)).send(body)
         }
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')

@@ -1,6 +1,7 @@
 import { Application, Request, Response } from "express"
 import { TypedEmitter } from "tiny-typed-emitter";
 import { FunctionBuilder } from "./src/classes/builder";
+import { SKRSContext2D } from "@napi-rs/canvas";
 
 export interface ConstructorOptions {
     port: number
@@ -55,6 +56,50 @@ export class Interpreter {
     private load(): void
 }
 
+export const Utils = {
+    /**
+     * Sends a warn to the console.
+     * @param error The error itself.
+     * @param data The source.
+     */
+    Warn(error: string, data: string): void;,
+    /**
+     * Checks if this string/number is a valid number resolvable.
+     * @param num The text to check if its a number.
+     */
+    isNumber(num: string): boolean;,
+    /**
+     * Convert a string to boolean.
+     * @param str The string to validate as boolean.
+     */
+    booleanify(str: string): boolean;,
+    /**
+     * Resolve a condition inside a string.
+     * @param condition The string conditional.
+     */
+    condition(condition: string): boolean | null;,
+    /**
+     * Convert a string to json.
+     * @param json The JSON/Object string.
+     */
+    loadObject(json: string): Record<string, any> | null;,
+    /**
+     * Checks if a string is a valid color code (hex) resolvable.
+     * @param str The color code.
+     */
+    isValidHex(str: string): boolean;,
+    /**
+     * Cuts a molde in the next drawing of the canvas.
+     * @param ctx The canvas context.
+     * @param x X position.
+     * @param y Y position.
+     * @param width Width.
+     * @param height Height.
+     * @param radius The circle radius.
+     */
+    molde(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, radius: number): void
+}
+
 export class Endpoints {
     constructor(app: Application)
     public app: Application
@@ -63,6 +108,13 @@ export class Endpoints {
     /**
      * Add a route to the API.
      * @param route The route data.
+     * @example
+     * module.exports = {
+     *      path: '/endpoint',
+     *      code: `
+     * $send[200;json;{text: "hello"}]
+     * `
+     * }
      */
     public add(route: Route): void
     /**
@@ -77,6 +129,7 @@ export class Endpoints {
 export class API extends TypedEmitter<Events> {
     public app: Application
     public interpreter: Interpreter
+    public routes: Endpoints
     constructor(options: ConstructorOptions)
     /**
      * Set the spaces in the objects.
