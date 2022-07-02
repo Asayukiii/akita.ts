@@ -16,7 +16,7 @@ export const data: SourceFunction = {
         if(!Utils.isNumber(r.inside)) return Utils.Warn('Invalid number provided in:', d.func)
         if(!d._.Canvas?.ctx) return Utils.Warn('Not canvas found, create one first using $createCanvas, in:', d.func)
         let n = Number(r.inside)
-        if(n > 100 || 1 > n) return Utils.Warn('Invalid opacity provided in:', d.func)
+        if(n > 100 || 0 > n) return Utils.Warn('Invalid opacity provided in:', d.func)
         d._.Canvas.ctx.globalAlpha = ResolvePer(n)
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')

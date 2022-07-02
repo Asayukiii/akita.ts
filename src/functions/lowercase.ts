@@ -10,7 +10,7 @@ export const data: SourceFunction = {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, r.inside.toLowerCase().escape()!)
+            code: d.code.resolve(`${d.func}[${r.inside}]`, r.inside.unescape()!.toLowerCase().escape()!)
         }
     }
 }

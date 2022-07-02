@@ -6,9 +6,11 @@ export class Interpreter {
     public functions: SourceFunction[]
     public app: Application
     public routes: Endpoints
-    constructor(app: Application, routes: Endpoints) {
+    public db: any
+    constructor(app: Application, routes: Endpoints, db: any) {
         this.functions = []
         this.app = app
+        this.db = db
         this.routes = routes
         this.load()
     }
@@ -22,7 +24,7 @@ export class Interpreter {
             splits: splits,
         }
     }
-    public async parse(text: string, req: Request, res: Response): Promise<any> {
+    public async parse(text: string, req: Request, res: Response): Promise<Data | undefined> {
         if(!text) return;
         let data: Data = { 
             app: this.app, code: text.replace(/\$[a-zA-Z]+[^\[]/g, x => x.toLowerCase()),
@@ -31,10 +33,10 @@ export class Interpreter {
             res,
             break: false,
             _: {},
-            routes: this.routes
+            routes: this.routes,
+            interpreter: this
         }
         let funcs = data.code.split('$')
-        data.code = funcs.join('$')
         for(let i = funcs.length - 1; i > 0; i--) {
             if(data.break) break;
             let split = "$" + funcs[i]
@@ -49,7 +51,7 @@ export class Interpreter {
                 }
             }
         }
-        return data.code
+        return data
     }
     public addFunction(func: SourceFunction): void {
         this.functions[this.functions.length] = func
@@ -77,6 +79,9 @@ export class Interpreter {
             .replaceAll('@and', '&&')
             .replaceAll('@higher', '>')
             .replaceAll('@lower', '<')
+            .replaceAll('@at', '@')
+            .replaceAll('@left_parent', ')')
+            .replaceAll('@right_parent', '(')
         }
         String.prototype.escape = function() {
             return this
@@ -89,6 +94,7 @@ export class Interpreter {
             .replaceAll('&&', '@and')
             .replaceAll('>', '@higher')
             .replaceAll('<', '@lower')
+            .replaceAll('@', '@at')
         }
         String.prototype.after = function () {
             const afterIndex = this.indexOf("[");

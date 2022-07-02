@@ -3,8 +3,15 @@ import { TypedEmitter } from "tiny-typed-emitter";
 import { FunctionBuilder } from "./src/classes/builder";
 import { SKRSContext2D } from "@napi-rs/canvas";
 
+export type AllowedDatabases = 'replit' | 'mongo' | 'default'
+
 export interface ConstructorOptions {
     port: number
+    database?: {
+        enabled?: boolean
+        type?: AllowedDatabases
+        mongoUrl?: string
+    }
 }
 
 export interface Events {
@@ -28,6 +35,7 @@ export interface Data {
     unpack: (d: Data) => UnpackedFunction
     _: Record<string, any>
     routes: Endpoints
+    interpreter: ThisType
 }
 
 export interface UnpackedFunction {
@@ -47,11 +55,12 @@ export interface SourceFunction {
 }
 
 export class Interpreter {
-    constructor(app: Application)
+    constructor(app: Application, routes: Endpoints, db: any)
     public functions: SourceFunction[]
     public app: Application
+    public db: any
     private unpack(d: Data): UnpackedFunction
-    public parse(text: string): string
+    public async parse(text: string, req: Request, res: Response): Promise<Data | undefined>
     public addFunction(func: SourceFunction)
     private load(): void
 }
@@ -127,6 +136,8 @@ export class Endpoints {
 }
 
 export class API extends TypedEmitter<Events> {
+    public port: number
+    public db: any
     public app: Application
     public interpreter: Interpreter
     public routes: Endpoints

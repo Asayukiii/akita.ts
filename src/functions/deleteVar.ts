@@ -4,13 +4,15 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('uppercase')
-    .setValue('description', 'Convert a string to uppercase.'),
+    .setName('deleteVar')
+    .setValue('description', 'Delete a variable from the database.'),
     code: async d => {
         let r = d.unpack(d)
+        if(!d.interpreter.db) return Utils.Warn('No database set yet, error in:', d.func)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
+        await d.interpreter.db.delete(r.inside)
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, r.inside.unescape()!.toUpperCase().escape()!)
+            code: d.code.resolve(`${d.func}[${r.inside}]`, '')
         }
     }
 }
