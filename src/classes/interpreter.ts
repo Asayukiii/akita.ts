@@ -70,6 +70,7 @@ export class Interpreter {
         }
         String.prototype.unescape = function() {
             return this
+            .replaceAll('@at', '@')
             .replaceAll('@left', ']')
             .replaceAll('@right', '[')
             .replaceAll('@semi', ';')
@@ -79,12 +80,12 @@ export class Interpreter {
             .replaceAll('@and', '&&')
             .replaceAll('@higher', '>')
             .replaceAll('@lower', '<')
-            .replaceAll('@at', '@')
             .replaceAll('@left_parent', ')')
             .replaceAll('@right_parent', '(')
         }
         String.prototype.escape = function() {
             return this
+            .replaceAll('@', '@at')
             .replaceAll(']', '@left')
             .replaceAll('[', '@right')
             .replaceAll(';', '@semi')
@@ -94,7 +95,6 @@ export class Interpreter {
             .replaceAll('&&', '@and')
             .replaceAll('>', '@higher')
             .replaceAll('<', '@lower')
-            .replaceAll('@', '@at')
         }
         String.prototype.after = function () {
             const afterIndex = this.indexOf("[");
