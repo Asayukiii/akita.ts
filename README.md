@@ -3,7 +3,11 @@ Make your own API with ease...
 
 ![img](https://i.imgur.com/2ksZSBy.jpg)
 
-- An easy api wrapper inspired in [aoi.js](https//npmjs.com/package/aoi.js)
+## Features
+- 🚀 Optimized and advanced codes and functions.
+- 📝 Easy to learn.
+- 📚 Constant updates.
+- 🔥 Sexy dev.
 
 ## Install
 ```
@@ -43,3 +47,5 @@ api.routes.load('./routes').then(() => {
     api.connect() // We're connecting to the API when the source is loaded.
 })
 ```
+
+Made with ❤️ by a Moonlight Group member~
