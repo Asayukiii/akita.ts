@@ -4,7 +4,8 @@ import { Utils } from "../classes/utils";
 import { SKRSContext2D, Image } from "@napi-rs/canvas";
 
 function fillText(ctx: SKRSContext2D, mytext: string, x: number, y: number, width: number, height: number, align: string, vAlign: string): void {
-    const size = Number(ctx.font.split('px')[0].trim())
+    // const size = Number(ctx.font.split('px')[0].trim())
+    const size = Number(ctx.font.match(/[\d]{1,5}px/g)![0].replace('px', ''))
     if (width <= 0 || height <= 0 || size <= 0) {
       //width or height or font size cannot be 0
       return
@@ -121,7 +122,9 @@ function getTextHeight(ctx: SKRSContext2D, text: string, style: string): number 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('drawText')
-    .setValue('description', 'Draws a text in the canvas.'),
+    .setValue('description', 'Draws a text in the canvas.')
+    .setValue('use', '$drawText[text;x;y;width;height;align?(right|left|center);vAlign?(top|bottom|middle)]')
+    .setValue('returns', 'Void'),
     code: async d => {
         // $drawText[text;x;y;width;height;align?;vAlign?]
         let r = d.unpack(d)

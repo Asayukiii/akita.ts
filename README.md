@@ -21,7 +21,7 @@ Check documentation [here](https://eats.miduwu.ga/) and join our [support server
 const { API } = require('easy-api.ts')
 
 const api = new API({
-    port: 3000
+    port: process.env.PORT || 3000
 })
 
 api.routes.add({

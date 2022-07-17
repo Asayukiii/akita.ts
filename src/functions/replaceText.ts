@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('replaceText')
-    .setValue('description', 'Replace something in the text.'),
+    .setValue('description', 'Replace something in the text.')
+    .setValue('use', '$replaceText[text;sample;target]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

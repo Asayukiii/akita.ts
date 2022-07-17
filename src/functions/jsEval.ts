@@ -6,7 +6,9 @@ import { inspect } from "util";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('jsEval')
-    .setValue('description', 'Eval a js code.'),
+    .setValue('description', 'Eval a js code.')
+    .setValue('use', '$jsEval[return(true/false);code]')
+    .setValue('returns', 'Any'),
     code: async d => {
         let r = d.unpack(d)
         const util = Utils

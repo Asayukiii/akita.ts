@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('setObjectKey')
-    .setValue('description', 'Set a value to a property in the object.'),
+    .setValue('description', 'Set a value to a property in the object.')
+    .setValue('use', '$setObjectKey[name;value]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         let obj = d._.object

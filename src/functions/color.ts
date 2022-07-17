@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('color')
-    .setValue('description', 'Set the canvas context fill style color.'),
+    .setValue('description', 'Set the canvas context fill style color.')
+    .setValue('use', '$color[hex]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

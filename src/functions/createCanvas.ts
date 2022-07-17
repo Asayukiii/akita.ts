@@ -6,7 +6,9 @@ import Canvas from "@napi-rs/canvas";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('createCanvas')
-    .setValue('description', 'Create a new canvas.'),
+    .setValue('description', 'Create a new canvas.')
+    .setValue('use', '$createCanvas[width;height]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

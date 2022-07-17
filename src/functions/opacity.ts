@@ -9,7 +9,9 @@ function ResolvePer(num: number): number {
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('opacity')
-    .setValue('description', 'Set the canvas context opacity.'),
+    .setValue('description', 'Set the canvas context opacity.')
+    .setValue('use', '$opacity[number]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

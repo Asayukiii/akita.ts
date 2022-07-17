@@ -4,15 +4,15 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('split')
-    .setValue('description', 'Splits a text.')
-    .setValue('use', '$split[text;separator]')
-    .setValue('returns', 'Void'),
+    .setName('sleep')
+    .setValue('description', 'Sleep a code for a time (wait function).')
+    .setValue('use', '$sleep[miliseconds]')
+    .setValue('returns', 'Awaitable<Void>'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
-        if(r.splits.length < 2) return Utils.Warn('Invalid fields provided in:', d.func)
-        d._.splits = r.splits.slice(0, r.splits.length - 1).join(';').unescape()!.split(r.splits[r.splits.length - 1])
+        if(!Utils.isNumber(r.inside)) return Utils.Warn('Invalid miliseconds provided in:', d.func)
+        await (new Promise(res => setTimeout(res, Number(r.inside))))
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')
         }

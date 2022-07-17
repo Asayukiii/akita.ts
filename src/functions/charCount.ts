@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('charCount')
-    .setValue('description', 'Get the characters length.'),
+    .setValue('description', 'Get the characters length.')
+    .setValue('use', '$charCount[text]')
+    .setValue('returns', 'Number'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

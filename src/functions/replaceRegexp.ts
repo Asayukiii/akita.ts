@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('replaceRegexp')
-    .setValue('description', 'Replace something in the text using RegExp.'),
+    .setValue('description', 'Replace something in the text using RegExp.')
+    .setValue('use', '$replaceRegexp[text;regexp;flag;target]')
+    .setValue('returns', 'String'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

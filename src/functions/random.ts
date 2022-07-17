@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('random')
-    .setValue('description', 'Get a random element from provided fields.'),
+    .setValue('description', 'Get a random element from provided fields.')
+    .setValue('use', '$random[...items]')
+    .setValue('returns', 'Any'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.splits.length) return Utils.Warn('Invalid fields provided in:', d.func)

@@ -4,13 +4,13 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('createObject')
-    .setValue('description', 'Create an original object.')
-    .setValue('use', '$createObject')
+    .setName('removeEffect')
+    .setValue('description', 'Remove the current effect from the canvas context.')
+    .setValue('use', '$removeEffect')
     .setValue('returns', 'Void'),
     code: async d => {
-        let obj: Record<string, any> = {}
-        d._.object = obj
+        if(!d._.Canvas?.ctx) return Utils.Warn('Not canvas found, create one first using $createCanvas, in:', d.func)
+        d._.Canvas.ctx.filter = 'none'
         return {
             code: d.code.resolve(`${d.func}`, '')
         }

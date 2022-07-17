@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('ternary')
-    .setValue('description', 'Returns something depending a result condition, anything if true and anything if false.'),
+    .setValue('description', 'Returns something depending a result condition, anything if true and anything if false.')
+    .setValue('use', '$ternary[condition;ifTrue;ifFalse]')
+    .setValue('returns', 'Any'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

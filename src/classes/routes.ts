@@ -3,6 +3,13 @@ import { lstatSync, readdirSync } from "fs";
 import { join } from "path";
 import { Route } from "../../index";
 import { Utils } from "./utils";
+import colors from "colors/safe"
+
+interface Debugged {
+    path: string
+    loaded: string
+    route?: string
+}
 
 export class Endpoints {
     public app: Application
@@ -21,22 +28,35 @@ export class Endpoints {
         if(route.details && typeof route.details !== 'object') throw new SyntaxError('Invalid extra object provided.')
         this.routes[this.routes.length] = route
     }
-    private async loadWithCache(dir: string): Promise<void> {
+    private async loadWithCache(dir: string, arr: Debugged[]): Promise<void> {
         let mdir = process.cwd()
         let modules = readdirSync(join(mdir, dir))
         for(const file of modules) {
             let stat = lstatSync(join(mdir, dir, file))
-            if(stat.isDirectory()) { this.loadWithCache(join(dir, file)); continue }
-            let route = require(join(mdir, dir, file))
-            route = !route?.path && route?.default?.path ? route.default: route
-            if(!route?.path || !route?.code) { Utils.Warn('Invalid route at:', join(dir, file)); continue }
-            delete require.cache[require(join(mdir, dir, file))]
-            this.add(route)
+            if(stat.isDirectory()) { this.loadWithCache(join(dir, file), arr); continue }
+            try {
+                let route = require(join(mdir, dir, file))
+                route = !route?.path && route?.default?.path ? route.default: route
+                if(!route?.path || !route?.code) { arr.push({path: join(mdir, dir, file), loaded: colors.red('Failed'), route: route?.path}); continue }
+                delete require.cache[require(join(mdir, dir, file))]
+                this.add(route)
+                arr.push({path: join(mdir, dir, file), loaded: colors.green('Loaded'), route: route.path})
+            } catch(e) {
+                console.log(e)
+                arr.push({path: join(mdir, dir, file), loaded: colors.red('Failed')})
+            }
         }
     }
     async load(dir: string): Promise<void> {
         if(!dir || typeof dir !== 'string') throw new SyntaxError('Invalid path provided.')
-        this.loadWithCache(dir).catch((e) => {
+        let arr: Debugged[] = []
+        let line = '| ----------------------------------------------------- |'
+        this.loadWithCache(dir, arr).then(() => {
+            // @ts-ignore
+            arr = arr.map(i => `| ${colors.grey(i.path)}\n| ${i.loaded} [${colors.cyan(i.route || 'Unknown route')}]\n${line}`)
+            console.log(line)
+            for(const i of arr) { console.log(i) }
+        }).catch((e) => {
             Utils.Warn(`Failed to load path with reason: ${e}. at:`, `load(${dir})`)
         })
     }

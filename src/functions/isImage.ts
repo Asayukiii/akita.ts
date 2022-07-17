@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('isImage')
-    .setValue('description', 'Check if an image was loaded.'),
+    .setValue('description', 'Check if an image was loaded.')
+    .setValue('use', '$isImage[id]')
+    .setValue('returns', 'Boolean'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

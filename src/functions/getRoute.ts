@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('getRoute')
-    .setValue('description', 'Get a route property.'),
+    .setValue('description', 'Get a route property.')
+    .setValue('use', '$getRoute[path;keys]')
+    .setValue('returns', 'Any'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

@@ -4,15 +4,15 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('isValidHex')
-    .setValue('description', 'Check if this is a valid hex color code.')
-    .setValue('use', '$isValidHex[text]')
-    .setValue('returns', 'Boolean'),
+    .setName('joinSplits')
+    .setValue('description', 'Get the splits elements in a separator.')
+    .setValue('use', '$joinSplits[separator]')
+    .setValue('returns', 'String'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, Utils.isValidHex(r.inside).toString())
+            code: d.code.resolve(`${d.func}[${r.inside}]`, d._.splits?.join(r.inside.unescape()).escape() || '')
         }
     }
 }

@@ -6,7 +6,9 @@ import { join } from "path";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('root')
-    .setValue('description', 'Get a header value.'),
+    .setValue('description', 'Join your files name to the process cwd.')
+    .setValue('use', '$root[...files]')
+    .setValue('returns', 'String'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid splits provided in:', d.func)

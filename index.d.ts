@@ -16,7 +16,7 @@ export interface ConstructorOptions {
 
 export interface Events {
     ready: (app: Application) => void;
-    error: (app: Application) => void;
+    error: (error: Error) => void;
 }
 
 export interface Route {
@@ -60,8 +60,9 @@ export class Interpreter {
     public app: Application
     public db: any
     private unpack(d: Data): UnpackedFunction
-    public async parse(text: string, req: Request, res: Response): Promise<Data | undefined>
+    public parse(text: string, req: Request, res: Response, d?: Data): Promise<Data | undefined>
     public addFunction(func: SourceFunction)
+    public getFunction(func: string): Record<string, any> | null
     private load(): void
 }
 
@@ -147,6 +148,11 @@ export class API extends TypedEmitter<Events> {
      * @param howmany The number of breaklines in the JSON objects.
      */
     public setSpaces(howmany: number): void;
+    /**
+     * Set a 404 page (using code)
+     * @param code The code to execute instead 'cannot get /X'
+     */
+    public set404(code: string): void;
     /**
      * Starts the API.
      */

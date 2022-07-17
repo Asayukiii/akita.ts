@@ -4,8 +4,10 @@ import { Utils } from "../classes/utils";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-    .setName('getHeader')
-    .setValue('description', 'Get a header value.'),
+    .setName('hasText')
+    .setValue('description', 'Check if this text has the provided thing.')
+    .setValue('use', '$hasText[source;something]')
+    .setValue('returns', 'Boolean'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

@@ -41,6 +41,15 @@ export class API extends TypedEmitter<Events> {
         if(isNaN(n) || 0 >= n || n >= 10) Utils.Warn('Invalid spaces number provided in:', '<API>.setSpaces()')
         this.app.set('json spaces', n)
     }
+    set404(code: string): void {
+        this.on('ready', () => {
+            this.app.all('*', (req, res) => {
+                this.interpreter.parse(code, req, res).catch(e => {
+                    this.emit('error', e)
+                })
+            })
+        })
+    }
     connect(): void {
         let routes = this.routes.getRoutes()
         for(const route of routes) {

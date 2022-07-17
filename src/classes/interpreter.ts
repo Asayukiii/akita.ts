@@ -24,15 +24,16 @@ export class Interpreter {
             splits: splits,
         }
     }
-    public async parse(text: string, req: Request, res: Response): Promise<Data | undefined> {
+    public async parse(text: string, req: Request, res: Response, d?: Data): Promise<Data | undefined> {
         if(!text) return;
         let data: Data = { 
             app: this.app, code: text.replace(/\$[a-zA-Z]+[^\[]/g, x => x.toLowerCase()),
-            func: '', unpack: this.unpack,
+            func: '',
+            unpack: this.unpack,
             req,
             res,
-            break: false,
-            _: {},
+            break: d?.break || false,
+            _: d?._ || {},
             routes: this.routes,
             interpreter: this
         }
@@ -55,6 +56,11 @@ export class Interpreter {
     }
     public addFunction(func: SourceFunction): void {
         this.functions[this.functions.length] = func
+    }
+    public getFunction(func: string): Record<string, any> | null {
+        let f = this.functions.find(i => i.data.name.includes(func.replace('$', '')))
+        if(!f) return null
+        return Object.assign({ name: f.data.name}, f.data.extra)
     }
     private load(): void {
         let dirs = fs.readdirSync(__dirname.replace('classes', 'functions'))

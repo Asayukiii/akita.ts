@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('send')
-    .setValue('description', 'Send something to the request.'),
+    .setValue('description', 'Send something to the request.')
+    .setValue('use', '$send[status;type(json/safe/canvas/file/redirect/other);body]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
@@ -27,9 +29,11 @@ export const data: SourceFunction = {
             d.res.set('Content-Type', aggent || 'image/png')
             d.res.status(parseInt(status)).send(canvas.toBuffer(aggent || 'image/png'))
         } else if(type.toLowerCase() === 'file') {
-            d.res.status(parseInt(status)).sendFile(body)
+            d.res.status(parseInt(status)).sendFile(body!.unescape()!)
         } else if(type.toLowerCase() === 'other') {
-            d.res.status(parseInt(status)).send(body)
+            d.res.status(parseInt(status)).send(body.unescape())
+        } else if(type.toLowerCase() === 'redirect') {
+            d.res.redirect(body.unescape()!)
         }
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')

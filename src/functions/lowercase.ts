@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('lowercase')
-    .setValue('description', 'Convert a string to lowercase.'),
+    .setValue('description', 'Convert a string to lowercase.')
+    .setValue('use', '$lowercase[text]')
+    .setValue('returns', 'String'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

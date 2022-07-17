@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('tryIf')
-    .setValue('description', 'Try a code if a condition is true (this is an advanced $if).'),
+    .setValue('description', 'Try a code (internal) if a condition is true (this is an advanced $if).')
+    .setValue('use', '$tryIf[condition;internal code]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
@@ -15,11 +17,9 @@ export const data: SourceFunction = {
         if(result) {
             code = code.replace(/@[a-zA-Z.]{1,35}\(/gim, x => x.replace('(', '[')).replace(/@[a-zA-Z.]{1,35}/gim, x => x.replace('@', '$')).replaceAll(')', ']')
             const interpreter: Interpreter = d.interpreter
-            let data = await interpreter.parse(code, d.req, d.res).catch((e: any) => {
+            await interpreter.parse(code, d.req, d.res, d).catch((e: any) => {
                 d.interpreter.emit('error', e)
             })
-            if(data?.break) d.break = true
-            if(data?._?.vars) d._.vars = Object.assign(d._.vars || {}, data?._.vars)
         }
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')

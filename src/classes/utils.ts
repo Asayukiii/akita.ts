@@ -11,7 +11,7 @@ const mi_e = (str: string) => Number(str.split('>')[0]) <= Number(str.split('>')
 
 export const Utils = {
     Warn(error: string, data: string): void {
-        console.log(`${colors.yellow(">> WARNING!!")} ${colors.red(error)} ${colors.cyan(data)}`)
+        console.log(`${colors.yellow("[ WARNING ]")} ${colors.red(error)} ${colors.cyan(data)}`)
     },
     isNumber(num: string): boolean {
         return num.replace(/[^0-9]/g, '').trim() ? true: false

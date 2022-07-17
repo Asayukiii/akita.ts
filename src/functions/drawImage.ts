@@ -6,7 +6,9 @@ import { Image } from "@napi-rs/canvas";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('drawImage')
-    .setValue('description', 'Draws an image in the canvas.'),
+    .setValue('description', 'Draws an image in the canvas.')
+    .setValue('use', '$drawImage[id;x;y;width;height;radius?]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

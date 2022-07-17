@@ -6,7 +6,9 @@ import axios, { AxiosRequestConfig } from "axios";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('request')
-    .setValue('description', 'Make a http request.'),
+    .setValue('description', 'Make a http request.')
+    .setValue('use', '$request[link;config?;...headers?]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

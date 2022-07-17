@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('deleteObjectKey')
-    .setValue('description', 'Delete a property from the object.'),
+    .setValue('description', 'Delete a property from the object.')
+    .setValue('use', '$deleteObjectKey[key]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         let obj = d._.object

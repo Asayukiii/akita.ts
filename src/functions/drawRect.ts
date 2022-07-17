@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('drawRect')
-    .setValue('description', 'Draws a rect in the canvas.'),
+    .setValue('description', 'Draws a rect in the canvas.')
+    .setValue('use', '$drawRect[x;y;width;height;radius?]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

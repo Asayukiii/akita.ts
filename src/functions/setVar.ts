@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('setVar')
-    .setValue('description', 'Set a variable to the database.'),
+    .setValue('description', 'Set a variable to the database.')
+    .setValue('use', '$setVar[name;value]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!d.interpreter.db) return Utils.Warn('No database set yet, error in:', d.func)

@@ -5,7 +5,9 @@ import { Utils } from "../classes/utils";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('if')
-    .setValue('description', 'Send and break something if that condition is true.'),
+    .setValue('description', 'Send and break something if that condition is true.')
+    .setValue('use', '$if[condition;status;body]')
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

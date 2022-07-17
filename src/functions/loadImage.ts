@@ -8,7 +8,9 @@ import axios from "axios";
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('loadImage')
-    .setValue('description', 'Load a new image and save it as an ID.'),
+    .setValue('description', 'Load a new image and save it as an ID.')
+    .setValue('use', '$loadImage[id;type(path|url);body]')
+    .setValue('returns', 'Void'),
     code: async d => {
         // $loadImage[id;type(path|url);body]
         let r = d.unpack(d)
