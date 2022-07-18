@@ -14,8 +14,9 @@ export const data: SourceFunction = {
         if(!d._.Canvas?.ctx) return Utils.Warn('Not canvas found, create one first using $createCanvas, in:', d.func)
         let [ name, read ] = r.splits
         if(!name || !read) return Utils.Warn('Invalid fields provided.', d.func)
+        if(!['blur', 'brightness', 'contrast', 'grayscale', 'invert', 'saturate', 'sepia'].some(t => t === name.unescape()!)) return Utils.Warn('Invalid type provided in:', d.func)
         if(!Utils.isNumber(read)) return Utils.Warn('Invalid number provided in:', d.func)
-        d._.Canvas.ctx.filter = `${name.unescape()}(${read})`
+        d._.Canvas.ctx.filter = `${name.unescape()}(${read}${name.unescape()! === 'blur' ? 'px': '%'})`
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')
         }
