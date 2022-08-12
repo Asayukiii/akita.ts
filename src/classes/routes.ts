@@ -4,6 +4,7 @@ import { join } from "path";
 import { Route } from "../../index";
 import { Utils } from "./utils";
 import colors from "colors/safe"
+import { API } from "./api";
 
 interface Debugged {
     path: string
@@ -38,7 +39,6 @@ export class Endpoints {
                 let route = require(join(mdir, dir, file))
                 route = !route?.path && route?.default?.path ? route.default: route
                 if(!route?.path || !route?.code) { arr.push({path: join(mdir, dir, file), loaded: colors.red('Failed'), route: route?.path}); continue }
-                delete require.cache[require(join(mdir, dir, file))]
                 this.add(route)
                 arr.push({path: join(mdir, dir, file), loaded: colors.green('Loaded'), route: route.path})
             } catch(e) {

@@ -1,7 +1,7 @@
 import { FunctionBuilder } from "../classes/builder";
 import { SourceFunction } from "../../index";
-import { Utils } from "../classes/utils";
-import { SKRSContext2D, Image } from "@napi-rs/canvas";
+import { Utils, getTextHeight } from "../classes/utils";
+import { SKRSContext2D } from "@napi-rs/canvas";
 
 function fillText(ctx: SKRSContext2D, mytext: string, x: number, y: number, width: number, height: number, align: string, vAlign: string): void {
     // const size = Number(ctx.font.split('px')[0].trim())
@@ -105,20 +105,6 @@ function fillText(ctx: SKRSContext2D, mytext: string, x: number, y: number, widt
 
 }
 
-function getTextHeight(ctx: SKRSContext2D, text: string, style: string): number {
-    const previousTextBaseline = ctx.textBaseline
-    const previousFont = ctx.font
-
-    ctx.textBaseline = 'bottom'
-    ctx.font = style
-    const { actualBoundingBoxAscent: height1, actualBoundingBoxDescent: height2 } = ctx.measureText(text)
-
-    // Reset baseline
-    ctx.textBaseline = previousTextBaseline
-    ctx.font = previousFont
-    return height1 + height2 + 1.7
-  }
-
 export const data: SourceFunction = {
     data: new FunctionBuilder()
     .setName('drawText')
@@ -130,7 +116,7 @@ export const data: SourceFunction = {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         if(r.splits.length < 3) return Utils.Warn('Invalid fields provided in:', d.func)
-        let [ text, x, y, width, height, align = 'center', vAlign = 'middle'] = r.splits
+        let [ text, x, y, width, height, align = 'left', vAlign = 'top'] = r.splits
         if(!Utils.isNumber(x) || !Utils.isNumber(y) || !Utils.isNumber(width) || !Utils.isNumber(height)) return Utils.Warn('Some numer is invalid in:', d.func)
         if(!d._.Canvas?.ctx) return Utils.Warn('Not canvas found, create one first using $createCanvas, in:', d.func)
         fillText(d._.Canvas.ctx, text.unescape()!, Number(x), Number(y), Number(width), Number(height), align, vAlign)

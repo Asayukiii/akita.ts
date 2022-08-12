@@ -12,9 +12,9 @@ export const data: SourceFunction = {
         let r = d.unpack(d)
         if(!d.interpreter.db) return Utils.Warn('No database set yet, error in:', d.func)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
-        let v = await d.interpreter.db.get(r.inside)
+        let v = await d.interpreter.db.get(r.inside.unescape())
         return {
-            code: d.code.resolve(`${d.func}[${r.inside}]`, v || 'undefined')
+            code: d.code.resolve(`${d.func}[${r.inside}]`, typeof v !== 'object' ? v.escape(): JSON.stringify(v, null, 2).escape()! || 'undefined')
         }
     }
 }

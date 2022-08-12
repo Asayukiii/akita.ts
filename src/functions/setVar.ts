@@ -14,7 +14,7 @@ export const data: SourceFunction = {
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         let [ k, v ] = r.splits
         if(!k || !v) return Utils.Warn('Invalid fields provided in:', d.func)
-        await d.interpreter.db.set(k, v)
+        await d.interpreter.db.set(k.unescape(), Utils.loadObject(v.unescape()!) || v.unescape()!)
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')
         }

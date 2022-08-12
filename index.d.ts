@@ -3,10 +3,11 @@ import { TypedEmitter } from "tiny-typed-emitter";
 import { FunctionBuilder } from "./src/classes/builder";
 import { SKRSContext2D } from "@napi-rs/canvas";
 
-export type AllowedDatabases = 'replit' | 'mongo' | 'default'
+export type AllowedDatabases = 'replit' | 'mongo' | 'quickdb' | 'default'
 
 export interface ConstructorOptions {
     port: number
+    spaces?: number
     database?: {
         enabled?: boolean
         type?: AllowedDatabases
@@ -146,6 +147,7 @@ export class API extends TypedEmitter<Events> {
     /**
      * Set the spaces in the objects.
      * @param howmany The number of breaklines in the JSON objects.
+     * @deprecated Use constructor object instead.
      */
     public setSpaces(howmany: number): void;
     /**
@@ -158,6 +160,8 @@ export class API extends TypedEmitter<Events> {
      */
     public connect(): void
 }
+
+export default { API, FunctionBuilder, Utils }
 
 declare global {
     interface String {

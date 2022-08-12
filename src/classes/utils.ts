@@ -5,16 +5,16 @@ import Hjson from "hjson"
 const equal = (str: string) => str.split('==')[0] == str.split('==')[1]
 const not_equal = (str: string) => str.split('!=')[0] != str.split('!=')[1]
 const major = (str: string) => Number(str.split('>')[0]) > Number(str.split('>')[1])
-const minor = (str: string) => Number(str.split('>')[0]) < Number(str.split('>')[1])
-const m_e = (str: string) => Number(str.split('>')[0]) >= Number(str.split('>')[1])
-const mi_e = (str: string) => Number(str.split('>')[0]) <= Number(str.split('>')[1])
+const minor = (str: string) => Number(str.split('<')[0]) < Number(str.split('<')[1])
+const m_e = (str: string) => Number(str.split('>=')[0]) >= Number(str.split('>=')[1])
+const mi_e = (str: string) => Number(str.split('<=')[0]) <= Number(str.split('<=')[1])
 
 export const Utils = {
     Warn(error: string, data: string): void {
         console.log(`${colors.yellow("[ WARNING ]")} ${colors.red(error)} ${colors.cyan(data)}`)
     },
     isNumber(num: string): boolean {
-        return num.replace(/[^0-9]/g, '').trim() ? true: false
+        return num.replace(/^-?\d*\.?\d+$/g, '') ? false: true
     },
     booleanify(str: string): boolean {
         let r;
@@ -31,6 +31,8 @@ export const Utils = {
                 if(and.includes('||')) results = or(and)
                 else if(and.includes('==')) results.push(equal(and))
                 else if(and.includes('!=')) results.push(not_equal(and))
+                else if(and.includes('>=')) results.push(m_e(and))
+                else if(and.includes('<=')) results.push(mi_e(and))
                 else if(and.includes('>')) results.push(major(and))
                 else if(and.includes('<')) results.push(minor(and))
                 else results.push(and);
@@ -75,10 +77,10 @@ function or(str: string): boolean | null {
         for(const or of ors) {
             if(or.includes('==')) results.push(equal(or))
             else if(or.includes('!=')) results.push(not_equal(or))
-            else if(or.includes('>')) results.push(major(or))
-            else if(or.includes('<')) results.push(minor(or))
             else if(or.includes('>=')) results.push(m_e(or))
             else if(or.includes('<=')) results.push(mi_e(or))
+            else if(or.includes('>')) results.push(major(or))
+            else if(or.includes('<')) results.push(minor(or))
             else results.push(or);
         }
         return results.some(Boolean)
@@ -86,3 +88,17 @@ function or(str: string): boolean | null {
         return null
     }
 }
+
+export function getTextHeight(ctx: SKRSContext2D, text: string, style: string): number {
+    const previousTextBaseline = ctx.textBaseline
+    const previousFont = ctx.font
+
+    ctx.textBaseline = 'bottom'
+    ctx.font = style
+    const { actualBoundingBoxAscent: height1, actualBoundingBoxDescent: height2 } = ctx.measureText(text)
+
+    // Reset baseline
+    ctx.textBaseline = previousTextBaseline
+    ctx.font = previousFont
+    return height1 + height2 + 1.7
+  }

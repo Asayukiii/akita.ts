@@ -1,5 +1,5 @@
 # EASY-API.TS
-Make your own API with ease...
+A powerful library to create your own API with ease.
 
 ![img](https://i.imgur.com/2ksZSBy.jpg)
 
@@ -21,10 +21,20 @@ Check documentation [here](https://eats.miduwu.ga/) and join our [support server
 const { API } = require('easy-api.ts')
 
 const api = new API({
-    port: process.env.PORT || 3000
+    port: process.env.PORT || 3000,
+    spaces: 1
 })
 
-api.routes.add({
+// Lets load the handler...
+api.routes.load('./routes').then(() => {
+    console.log('Source loaded.')
+    api.connect() // We're connecting to the API when the source is loaded.
+})
+```
+
+## Route example
+```js
+module.exports = {
     path: '/color',
     code: `
     $ignore[Check docs to see how does functions work]
@@ -39,13 +49,7 @@ api.routes.add({
         error: "Missing 'hex' parameter."
     }]
     `
-})
-
-// Lets load the handler...
-api.routes.load('./routes').then(() => {
-    console.log('Source loaded.')
-    api.connect() // We're connecting to the API when the source is loaded.
-})
+}
 ```
 
 Made with ❤️ by a Moonlight Group member~

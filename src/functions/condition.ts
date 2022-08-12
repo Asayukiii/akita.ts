@@ -11,7 +11,7 @@ export const data: SourceFunction = {
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
-        let result = Utils.condition(r.inside)
+        let result = Utils.condition(r.inside.unescape()!)
         if(result === null) return Utils.Warn('Invalid condition provided in:', d.func)
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, result.toString())

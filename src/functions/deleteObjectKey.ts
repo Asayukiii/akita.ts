@@ -1,6 +1,7 @@
 import { FunctionBuilder } from "../classes/builder";
 import { SourceFunction } from "../../index";
 import { Utils } from "../classes/utils";
+import _ from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -13,7 +14,7 @@ export const data: SourceFunction = {
         let obj = d._.object
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)
         if(!obj) return Utils.Warn('No object created found. Use $createObject first. Error at:', d.func)
-        delete obj[r.inside]
+        _.unset(obj, r.inside.unescape()!)
         d._.object = obj
         return {
             code: d.code.resolve(`${d.func}[${r.inside}]`, '')
