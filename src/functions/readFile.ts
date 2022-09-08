@@ -11,11 +11,11 @@ export const data: SourceFunction = {
     .setValue('returns', 'String'),
     code: async d => {
         let r = d.unpack(d);
-            if (!r.inside) return Utils.Warn('Invalid inside provided in:', d.func);
+        if (!r.inside) return Utils.Warn('Invalid inside provided in:', d.func);
         let [path] = r.splits;
-            if (!path) return Utils.Warn('Path is required in:', d.func);
+        if (!path) return Utils.Warn('Path is required in:', d.func);
         try {
-            const file = fs.readFileSync(path)
+            let file = fs.readFileSync(path)
             return {
                 code: d.code.resolve(`${d.func}[${r.inside}]`, file?.toString?.())
             };

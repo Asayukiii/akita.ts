@@ -11,13 +11,13 @@ export const data: SourceFunction = {
     .setValue('returns', 'String'),
     code: async d => {
         let r = d.unpack(d);
-            if (!r.inside) return Utils.Warn('Invalid inside provided in:', d.func);
+        if (!r.inside) return Utils.Warn('Invalid inside provided in:', d.func);
         let [path, decimals = 2] = r.splits;
-            if (!path) return Utils.Warn('Path is required in:', d.func);
-            if (isNaN(decimals) || decimals < 0) return Utils.Warn('Invalid decimal count in:', d.func);
+        if (!path) return Utils.Warn('Path is required in:', d.func);
+        if (isNaN(Number(decimals)) || Number(decimals) < 0) return Utils.Warn('Invalid decimal count in:', d.func);
         try {
             let file = fs.statSync(path)
-            let result = (file.size / 1024).toFixed(decimals)
+            let result = (file.size / 1024).toFixed(Number(decimals))
             return {
                 code: d.code.resolve(`${d.func}[${r.inside}]`, result)
             };
