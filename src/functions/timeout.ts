@@ -7,7 +7,7 @@ export const data: SourceFunction = {
     .setName('timeout')
     .setValue('description', 'Set the max timeout for this route and the JSON response.')
     .setValue('use', '$timeout[miliseconds;status;json]')
-    .setValue('returns', 'String'),
+    .setValue('returns', 'Void'),
     code: async d => {
         let r = d.unpack(d)
         if(!r.inside) return Utils.Warn('Invalid inside provided in:', d.func)

@@ -7,7 +7,7 @@ A powerful library to create your own API with ease.
 - 🚀 Optimized and advanced codes and functions.
 - 📝 Easy to learn.
 - 📚 Constant updates.
-- 🔥 Sexy dev.
+- 🔥 Sexy devs.
 
 ## Install
 ```
@@ -52,4 +52,4 @@ module.exports = {
 }
 ```
 
-Made with ❤️ by a Moonlight Group member~
+Made with ❤️ by a **Moonlight Group**
