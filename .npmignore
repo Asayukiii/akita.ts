@@ -1,5 +1,9 @@
-src
-node_modules
-tsconfig.json
-dist/tests
+interpreter.test.js
 package-lock.json
+index.test.js
+tsconfig.json
+dist/ignore/
+node_modules
+database
+doc
+src

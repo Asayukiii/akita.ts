@@ -1,48 +1,36 @@
-import { Application, Request, Response } from "express"
-import { TypedEmitter } from "tiny-typed-emitter";
+import type { Interpreter } from "./src/classes/interpreter";
+import type { Compiler, FnD } from "./src/classes/compiler";
+import type { Container } from "./src/classes/container";
+import { Application, Request, Response } from "express";
 import { FunctionBuilder } from "./src/classes/builder";
-import { SKRSContext2D } from "@napi-rs/canvas";
+import type { Context } from "./src/classes/context";
+import { AkitaClient } from "src/main";
 
-export type AllowedDatabases = 'replit' | 'mongo' | 'quickdb' | 'default'
+export type CommandType = "MESSAGE" | "INTERACTION" | "MEMBER_ADD" | "MEMBER_REMOVE"
+export type Falsy = false | void | "" | 0 | null | undefined
+export type Truthy<T> = T extends Falsy ? never : T;
 
-export interface ConstructorOptions {
-    port: number
-    spaces?: number
-    database?: {
-        enabled?: boolean
-        type?: AllowedDatabases
-        mongoUrl?: string
-    }
-}
-
-export interface Events {
-    ready: (app: Application) => void;
-    error: (error: Error) => void;
-}
-
-export interface Route {
-    path: string
-    details?: Record<string, any>
+export interface Command {
+    names?: string[]
+    type: CommandType
     code: string
+}
+
+export interface Metadata extends Record<K, T> {
+    yields: Record
+    ctn: Container
+    ctx: Context
+    vars: Record
 }
 
 export interface Data {
-    app: Application
+    interpreter: Interpreter
+    client: AkitaClient
+    metadata: Metadata
+    compiler: Compiler
+    break: Falsy | Truthy
     code: string
-    func: string
-    req: Request
-    res: Response
-    break: boolean
-    unpack: (d: Data) => UnpackedFunction
-    _: Record<string, any>
-    routes: Endpoints
-    interpreter: ThisType
-}
-
-export interface UnpackedFunction {
-    name: string
-    inside: string | null
-    splits: string[] | []
+    func: FnD 
 }
 
 export interface FunctionBuilderData {
@@ -52,18 +40,14 @@ export interface FunctionBuilderData {
 
 export interface SourceFunction {
     data: FunctionBuilderData | FunctionBuilder
-    code: (data: Data) =>  Promise<{ code: string } | void>
+    code: (data: Data) => Promise<{ code: string } | void>
 }
 
 export class Interpreter {
-    constructor(app: Application, routes: Endpoints, db: any)
+    constructor()
     public functions: SourceFunction[]
-    public app: Application
-    public db: any
-    private unpack(d: Data): UnpackedFunction
     public parse(text: string, req: Request, res: Response, d?: Data): Promise<Data | undefined>
     public addFunction(func: SourceFunction)
-    public getFunction(func: string): Record<string, any> | null
     private load(): void
 }
 
@@ -88,89 +72,17 @@ export const Utils = {
      * Resolve a condition inside a string.
      * @param condition The string conditional.
      */
-    condition(condition: string): boolean | null;,
-    /**
-     * Convert a string to json.
-     * @param json The JSON/Object string.
-     */
-    loadObject(json: string): Record<string, any> | null;,
-    /**
-     * Checks if a string is a valid color code (hex) resolvable.
-     * @param str The color code.
-     */
-    isValidHex(str: string): boolean;,
-    /**
-     * Cuts a molde in the next drawing of the canvas.
-     * @param ctx The canvas context.
-     * @param x X position.
-     * @param y Y position.
-     * @param width Width.
-     * @param height Height.
-     * @param radius The circle radius.
-     */
-    molde(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, radius: number): void
+    condition(condition: string): boolean | null;
 }
 
-export class Endpoints {
-    constructor(app: Application)
-    public app: Application
-    public routes: Route[]
-    public getRoutes(): Route[]
-    /**
-     * Add a route to the API.
-     * @param route The route data.
-     * @example
-     * module.exports = {
-     *      path: '/endpoint',
-     *      code: `
-     * $send[200;json;{text: "hello"}]
-     * `
-     * }
-     */
-    public add(route: Route): void
-    /**
-     * Load a routes directory (Handler)
-     * @param dir The directory path
-     * @example
-     * <API>.routes.load('./routes')
-     */
-    public async load(dir: string): Promise<void>
-}
-
-export class API extends TypedEmitter<Events> {
-    public port: number
-    public db: any
-    public app: Application
-    public interpreter: Interpreter
-    public routes: Endpoints
-    constructor(options: ConstructorOptions)
-    /**
-     * Set the spaces in the objects.
-     * @param howmany The number of breaklines in the JSON objects.
-     * @deprecated Use constructor object instead.
-     */
-    public setSpaces(howmany: number): void;
-    /**
-     * Set a 404 page (using code)
-     * @param code The code to execute instead 'cannot get /X'
-     */
-    public set404(code: string): void;
-    /**
-     * Starts the API.
-     */
-    public connect(): void
-}
-
-export default { API, FunctionBuilder, Utils }
+export default { FunctionBuilder, Utils, AkitaClient }
 
 declare global {
     interface String {
-        /**
-         * Replace last argument from a string.
-         */
-        resolve(What: string, Replacement: string): string
-        after(): string | null
-        escape(): string | null
-        unescape(): string | null
+        replaceLast(pattern: string | RegExp, replacer?: string): string
+        asyncReplace(pattern: any, replacer?: any): Promise<string>
+        replace(searchValue: string | RegExp, replaceValue: any)
+        unescape(): string 
+        escape(): string
     }
 }

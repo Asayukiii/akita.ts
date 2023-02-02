@@ -1,4 +1,1 @@
-src/tests
-dist
-node_modules
-package-lock.json
+index.test.js

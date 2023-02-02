@@ -1,228 +1,167 @@
-import { Application, Request, Response } from "express";
-import { SourceFunction, UnpackedFunction, Data, Endpoints } from "../../index";
-import fs from 'fs'
+import { SourceFunction, Data, Falsy } from "../../index";
+import { Compiler, FnD } from "./compiler";
+import { Container } from "./container";
+import { AkitaClient } from "./client";
+import { Utils } from "./utils";
+import lodash from "lodash";
+import fs from "fs";
 
 export class Interpreter {
     public functions: SourceFunction[]
-    public app: Application
-    public routes: Endpoints
-    public db: any
-    constructor(app: Application, routes: Endpoints, db: any) {
-        this.functions = []
-        this.app = app
-        this.db = db
-        this.routes = routes
-        this.load()
-    }
-    private unpack(d: Data): UnpackedFunction {
-        const r = d.code.split(d.func).length - 1;
-        const inside = d.code.split(d.func)[r].after()
-        let splits = inside?.split(';') || []
-        return {
-            name: d.func.replace('$', ''),
-            inside: inside,
-            splits: splits,
+    private compiler: Compiler;
+    constructor() {
+        this.compiler = new Compiler("");
+        this.functions = [];
+        this.load();
+        this.compiler.set_functions(this.functions.map(function (fn: SourceFunction) {
+            return fn.data.name;
+        }));
+    };
+    public fields(data: Data, index: number = 0, unescape: boolean = true): string[] {
+        return data.func.fields?.slice(index)?.map(a => unescape ? a.value.unescape()?.trim()! : a.value.trim()) || [];
+    };
+    public async resolve_fields(data: Data, start = 0, end: number | Falsy = undefined): Promise<FnD> {
+        for (let i = start; i < data.func?.fields?.length!; i++) {
+            if (i == end) break;
+            data.func = await this.resolve_field(data, i);
+        };
+        return data.func!;
+    };
+    public async resolve_field(data: Data, index: number): Promise<FnD> {
+        if (data.func?.fields?.[index]) {
+            for (const over of data.func.fields[index].overs) {
+                let finded = data.interpreter.functions.find(f => f.data.name == over.name);
+                if (finded) {
+                    over.resolve_fields = this.resolve_fields;
+                    over.resolve_field = this.resolve_field;
+                    let new_data = { ...data, func: over, code: data.func!.fields![index].value }
+                    const reject = await finded.code(new_data);
+                    if (reject?.code && data.func?.inside && data.func.fields) {
+                        data.func.fields[index].value = reject.code;
+                        data.func.inside = data.func.fields.map((field) => field.value).join(";");
+                        data.func.total = `${data.func.name}[${data.func.inside}]`;
+                        data.break = new_data.break;
+                        data.metadata = new_data.metadata;
+                    };
+                };
+            };
+        };
+        return data.func!;
+    };
+    public async parse(text: string, d: undefined | Data, client: AkitaClient): Promise<Data | undefined> {
+        if (text) {
+            this.compiler.set_code(text);
+            this.compiler.match();
+            let data: Data = {
+                metadata: lodash.merge({
+                    ctn: new Container().setInstance(d?.metadata?.ctx?.data),
+                    parent: d?.metadata?.parent || null,
+                    yields: d?.metadata?.yields || {},
+                    vars: d?.metadata?.vars || {}
+                }, d?.metadata),
+                code: this.compiler.result || "",
+                compiler: this.compiler,
+                interpreter: this,
+                break: !!d?.break,
+                func: {} as FnD,
+                client
+            };
+            for (const fn of Object.values(this.compiler.matched!).reverse()) {
+                if (data.break) break;
+                data = await this.run_function(fn, data) || data;
+            };
+            return data;
+        };
+    };
+    public async run_function(fn: FnD, d: Data): Promise<Data> {
+        try {
+            let finded = this.functions.find(i => i.data.name == fn.name);
+            if (finded) {
+                fn.resolve_fields = this.resolve_fields; fn.resolve_field = this.resolve_field; d.func = fn;
+                const reject = await finded.code(d);
+                if (reject?.code) {
+                    d.code = reject!.code?.trim() || "";
+                };
+            };
+            return d;
+        } catch ($: unknown) {
+            d.client.emit("functionError", $ as Error, d);
+            return d;
+        };
+    };
+    public async _(fn: FnD) {
+        if (fn.fields) {
+            for (let i = 0; i < fn.fields.length; i++) {
+                for (let o of fn.fields[i].overs) {
+                    await this._(o);
+                    fn.fields[i].value = fn.fields[i].value.replaceAll(o.id, o.total);
+                    fn.inside = fn.inside!?.replaceAll(o.id, o.total);
+                    fn.total = fn.total.replaceAll(o.id, o.total);
+                };
+            };
         }
-    }
-    public async parse(text: string, req: Request, res: Response, d?: Data): Promise<Data | undefined> {
-        if(!text) return;
-        let data: Data = { 
-            app: this.app, code: text.replace(/\$[a-zA-Z]+[^\[]/g, x => x.toLowerCase()),
-            func: '',
-            unpack: this.unpack,
-            req,
-            res,
-            break: d?.break || false,
-            _: d?._ || {},
-            routes: this.routes,
-            interpreter: this
-        }
-        let funcs = data.code.split('$')
-        for(let i = funcs.length - 1; i > 0; i--) {
-            if(data.break) break;
-            let split = "$" + funcs[i]
-            let name = split.split('$')[1]?.split('[')?.[0]?.trim()?.replace(']', '')?.toLowerCase()
-            let func = this.functions.find(f => name == f.data.name.toLowerCase())
-            if(!func) continue;
-            data.func = '$'+ func.data.name.toLowerCase()
-            if(func) {
-                let loaded = await func.code(data)
-                if(loaded) {
-                    data.code = loaded.code?.trim()
-                }
-            }
-        }
-        return data
-    }
+    };
     public addFunction(func: SourceFunction): void {
-        this.functions[this.functions.length] = func
-    }
-    public getFunction(func: string): Record<string, any> | null {
-        let f = this.functions.find(i => i.data.name.includes(func.replace('$', '')))
-        if(!f) return null
-        return Object.assign({ name: f.data.name}, f.data.extra)
-    }
+        this.functions[this.functions.length] = func;
+        this.compiler.set_functions(this.functions.map(function (fn: SourceFunction) {
+            return fn.data.name;
+        }));
+        this.functions.sort((a, b) => b.data.name.length - a.data.name.length)
+    };
     private load(): void {
-        let dirs = fs.readdirSync(__dirname.replace('classes', 'functions'))
-        for(const file of dirs) {
-            const r: SourceFunction | undefined = require(`../functions/${file}`).data
-            if(!r) continue;
-            this.addFunction(r)
-        }
-        String.prototype.resolve = function (w: string, r: string) {
-            let p_s = this.split(w)
-            let last = p_s.pop()
-            return p_s.join(w) + r + last
-        }
-        String.prototype.unescape = function() {
+        let mod = __dirname.replace("classes", "functions");
+        for (const folder of fs.readdirSync(mod)) {
+            for (const file of fs.readdirSync(`${mod}/${folder}/`)) {
+                const r: SourceFunction | undefined = require(`../functions/${folder}/${file}`).data
+                if (r) this.addFunction(r);
+            };
+        };
+        String.prototype.unescape = function () {
             return this
-            .replaceAll('@at', '@')
-            .replaceAll('@left', ']')
-            .replaceAll('@right', '[')
-            .replaceAll('@semi', ';')
-            .replaceAll('@colon', ':')
-            .replaceAll('@equal', '=')
-            .replaceAll('@or', '||')
-            .replaceAll('@and', '&&')
-            .replaceAll('@higher', '>')
-            .replaceAll('@lower', '<')
-            .replaceAll('@left_parent', ')')
-            .replaceAll('@right_parent', '(')
-        }
-        String.prototype.escape = function() {
+                .replace(/@at/gi, "@")
+                .replace(/@left/gi, "[")
+                .replace(/@right/gi, "]")
+                .replace(/@semi/gi, ";")
+                .replace(/@colon/gi, ":")
+                .replace(/@equal/gi, "=")
+                .replace(/@or/gi, "||")
+                .replace(/@and/gi, "&&")
+                .replace(/@higher/gi, ">")
+                .replace(/@lower/gi, "<")
+                .replace(/@left_parent/gi, ")")
+                .replace(/@right_parent/gi, "(")
+                .replace(/@dollar/gi, "$")
+        };
+        String.prototype.escape = function () {
             return this
-            .replaceAll('@', '@at')
-            .replaceAll(']', '@left')
-            .replaceAll('[', '@right')
-            .replaceAll(';', '@semi')
-            .replaceAll(':', '@colon')
-            .replaceAll('=', '@equal')
-            .replaceAll('||', '@or')
-            .replaceAll('&&', '@and')
-            .replaceAll('>', '@higher')
-            .replaceAll('<', '@lower')
-        }
-        String.prototype.after = function () {
-            const afterIndex = this.indexOf("[");
-            const after = this.replace(/(\s|\n)/gim, "").startsWith("[")
-              ? this.split("[").slice(1).join("[")
-              : undefined;
-          
-            let inside;
-          
-            if (after) {
-              const rightIndexes = searchIndexes("[", after);
-              const leftIndexes = searchIndexes("]", after);
-          
-              if (leftIndexes.length === 0) {
-                inside = after;
-              } else if (rightIndexes.length === 0) {
-                inside = after.substring(0, leftIndexes[0]);
-              } else {
-                const merged = [];
-          
-                let leftIndex = 0;
-          
-                for (let i = 0; i < rightIndexes.length; ++i) {
-                  const right = rightIndexes[i];
-          
-                  let left = leftIndexes[leftIndex];
-          
-                  while (left < right && typeof left === "number") {
-                    merged.push({
-                      index: left,
-                      isLeft: true,
-                    });
-          
-                    left = leftIndexes[++leftIndex];
-                  }
-                  merged.push({
-                    index: right,
-                    isLeft: false,
-                  });
-          
-                  if (typeof left !== "number") break;
+                .replace(/@/g, "@at")
+                .replace(/\]/g, "@right")
+                .replace(/\[/g, "@left")
+                .replace(/;/g, "@semi")
+                .replace(/:/g, "@colon")
+                .replace(/=/g, "@equal")
+                .replace(/\|\|/g, "@or")
+                .replace(/&&/g, "@and")
+                .replace(/>/g, "@higher")
+                .replace(/</g, "@lower")
+                .replace(/\$/g, "@dollar")
+        };
+        String.prototype.asyncReplace = function (pattern: string | RegExp, replacer: Function | string) {
+            let _this = this, values: any[] = [];
+            try {
+                if (typeof replacer === "function") {
+                    return _this.replace(pattern, function () {
+                        return values.push(replacer.apply(undefined, arguments)), ""
+                    }), Promise.all(values)
+                        .then(function (resolved) {
+                            return _this.replace(pattern, () => resolved.shift()!);
+                        });
+                } else {
+                    return Promise.resolve(this.replace(pattern, replacer));
                 }
-          
-                while (leftIndex < leftIndexes.length) {
-                  const left = leftIndexes[leftIndex++];
-          
-                  merged.push({
-                    index: left,
-                    isLeft: true,
-                  });
-                }
-          
-                let index = 0;
-                let depth = 1;
-          
-                for (let i = 0; i < merged.length; ++i) {
-                  const obj = merged[i];
-          
-                  index = obj.index;
-          
-                  if (obj.isLeft) --depth;
-                  else ++depth;
-          
-                  if (!depth) break;
-                }
-          
-                if (depth) index = after.length;
-          
-                inside = after.substring(0, index);
-              }
-            }
-            return inside || null
-        }
-    }
-}
-
-function searchIndexes(pat: string, txt: string) {
-    const patLength = pat.length;
-    const txtLength = txt.length;
-
-    const lps = new Array(patLength).fill(0);
-
-    processPattern(pat, patLength, lps);
-
-    const indexes = [];
-
-    let patIndex = 0;
-    let txtIndex = 0;
-
-    while (txtIndex < txtLength) {
-        if (pat[patIndex] === txt[txtIndex]) {
-            ++patIndex;
-            ++txtIndex;
-        }
-
-        if (patIndex === patLength) {
-            indexes.push(txtIndex - patIndex);
-            patIndex = lps[patIndex - 1];
-        } else if (txtIndex < txtLength && pat[patIndex] !== txt[txtIndex]) {
-            if (patIndex !== 0) {
-                patIndex = lps[patIndex - 1];
-            } else {
-                ++txtIndex;
+            } catch (error) {
+                return Promise.reject(error);
             }
         }
     }
-
-    return indexes;
-}
-
-function processPattern(pat: string, patLength: number, lps: any[]) {
-    let len = 0;
-    let index = 1;
-
-    while (index < patLength) {
-        if (pat[index] === pat[len]) {
-            ++len;
-            lps[index++] = len;
-        } else if (len !== 0) {
-            len = lps[len - 1];
-        } else {
-            lps[index++] = 0;
-        }
-    }
-}
+};

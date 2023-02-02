@@ -1,55 +1,66 @@
-# EASY-API.TS
-A powerful library to create your own API with ease.
+# **AkitaTS** - Imagine easy bots
+>  Fast, easy and string based with BDFD syntax
 
-![img](https://i.imgur.com/2ksZSBy.jpg)
+![Japanese Akita](https://imgs.search.brave.com/_Zfncw4BTyC7iTJlthHAnBxdH_xKjzU2Bp60OSoc4lo/rs:fit:313:313:1/g:ce/aHR0cHM6Ly82NC5t/ZWRpYS50dW1ibHIu/Y29tLzg5NjEyNTdj/MDBlZjgwNWVlMDAz/OTUzZmZlN2Q0NDJk/L3R1bWJscl9wMGpv/NzFSRTNRMXIzdmg3/cm8xXzQwMC5naWZ2)
 
-## Features
-- 🚀 Optimized and advanced codes and functions.
-- 📝 Easy to learn.
-- 📚 Constant updates.
-- 🔥 Sexy devs.
+- - -
 
-## Install
-```
-npm i easy-api.ts
-```
-
-Check documentation [here](https://eats.miduwu.ga/) and join our [support server](https://discord.gg/fc6n37dCgY).
-
-## Setup
 ```js
-const { API } = require('easy-api.ts')
-
-const api = new API({
-    port: process.env.PORT || 3000,
-    spaces: 1
-})
-
-// Lets load the handler...
-api.routes.load('./routes').then(() => {
-    console.log('Source loaded.')
-    api.connect() // We're connecting to the API when the source is loaded.
-})
-```
-
-## Route example
-```js
-module.exports = {
-    path: '/color',
+// import { AkitaClient } from "akita.ts";
+var { AkitaClient } = require("akita.ts"),
+    client = new AkitaClient({
+        intents: [1, 2, 512, 32768] /* example discord intents */
+    }, "BOT_PREFIX");
+client.onMessageCreate();
+client.addCommand({
+    names: ["test"],
+    type: "MESSAGE",
     code: `
-    $ignore[Check docs to see how does functions work]
-    $send[200;canvas;$default]
-    $drawRect[0;0;512;512]
-    $color[$getQuery[hex]]
-    $createCanvas[512;512]
-    $if[$isValidHex[$getQuery[hex]]==false;400;{
-        error: "Invalid hex code provided."
-    }]
-    $if[$getQuery[hex]==undefined;400;{
-        error: "Missing 'hex' parameter."
-    }]
+    $content[Hi $author[username]!]
+    $send[no]
     `
-}
+});
+client.login("YOUR_BOT_TOKEN");
 ```
 
-Made with ❤️ by a **Moonlight Group**
+- - -
+
+## Custom Functions
+
+~~~js
+// import { FunctionBuilder } from "akita.ts";
+client.interpreter.addFunction({
+    data: new FunctionBuilder()
+        .setName('THE FUNCTION NAME WITHOUT $') // "myFunc"
+        .setValue('description', 'THE FUNCTION DESCRIPTION') // "makes something"
+        .setValue('use', 'AN EXAMPLE OF USE') // "$myFunc[arg1;arg2;...rest]"
+        .setValue('returns', 'TYPE'), // "String"
+    code: async (d: Data) => {
+        // This will allow the inside of $myFunc to be executed! ("d" IS necessary)
+        // await d.func.resolve_overloads(d);
+
+        // This execute an especific field of $myFunc ("d" IS necessary)
+        // await d.func.resolve_overload(d, index);
+        return {
+            code: d.code.replace(d.func.id, /* result, use "" for void value*/)
+        };
+    }
+});
+~~~
+
+### Function Interface <small>*(for d.func)*</small>
+
+~~~json
+{
+    "resolve_fields": "ASYNC FUNCTION",
+    "resolve_field": "ASYNC FUNCTION",
+    "fields": [{
+        "value": "STRING",
+        "overs": "Array<FUNCTION DATA>",
+    }, "..."],
+    "inside": "STRING",
+    "total": "STRING",
+    "name": "STRING",
+    "id": "STRING"
+}
+~~~

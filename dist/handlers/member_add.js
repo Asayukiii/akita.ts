@@ -1,0 +1,1 @@
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0});const context_1=require("../classes/context");function default_1(e,t){var o,r=t.commands.filter(e=>"MEMBER_ADD"==e.type.toUpperCase()),c=new context_1.Context(e);for(o of r)t.resolve(o.code,{metadata:{member:e,cmd:o,ctx:c}},t)}exports.default=default_1;
