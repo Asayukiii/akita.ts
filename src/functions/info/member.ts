@@ -6,10 +6,13 @@ import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('user')
-        .setValue('description', 'find a user and get properties')
-        .setValue('use', '$user[resolvable;properties?]')
+        .setName('member')
+        .setValue('description', 'find a member and get properties')
+        .setValue('use', '$member[guild;resolvable;properties?]')
         .setValue('fields', [{
+            name: 'guild',
+            type: 'snowflake<guild>'
+        }, {
             name: 'resolvable',
             type: 'string',
         }, {
@@ -17,16 +20,20 @@ export const data: SourceFunction = {
             type: 'string',
             optional: true
         }])
-        .setValue('example', '$user[Pavez#1995;id]')
+        .setValue('example', '$member[Pavez;user;id]')
         .setValue('returns', 'Unknown'),
     code: async function (this: That) {
         await this.resolveFields()
-        let [resolvable, ...properties] = this.fields.split(true) as string[],
-            user = await Utils.findUser(this, resolvable), result = "undefined"
-        if (!user) return this.makeReturn("undefined")
+        let [guildId = "self", resolvable, ...properties] = this.fields.split(true) as string[],
+            guild = guildId.toLowerCase() === "self"
+                ? this.data.metadata.ctx.getGuild()
+                : this.data.client.guilds.cache.get(guildId);
+        if (!guild) return this.warn("invalid guild id provided")
+        let member = await Utils.findMember(guild, resolvable), result = "undefined"
+        if (!member) return this.makeReturn("undefined")
         result = properties[0]?.startsWith("invoke:")
-            ? await Utils.Invoke(this, properties.shift()!, properties, user)
-            : get(user, properties.join(".") || "id")
+            ? await Utils.Invoke(this, properties.shift()!, properties, member)
+            : get(member, properties.join(".") || "id")
         return this.makeReturn(result)
         // d.func = await d.func.resolve_fields(d);
         // let [resolvable, ...properties] = d.interpreter.fields(d), user = await Utils.findUser(d, resolvable), r;

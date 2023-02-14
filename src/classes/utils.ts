@@ -1,9 +1,11 @@
 // @ts-ignore
 import { Data, Falsy } from "../../index"
-import { User } from "discord.js";
-import _, { noop } from "lodash";
+import { Guild, GuildMember, User } from "discord.js";
+import _, { noop, filter } from "lodash";
 import Hjson from "hjson";
+import fs from "fs";
 import "colors";
+import { That } from "./data";
 
 var equal = (str: string) => str.split('==')[0] == str.split('==')[1],
     not_equal = (str: string) => str.split('!=')[0] != str.split('!=')[1],
@@ -22,23 +24,32 @@ var equal = (str: string) => str.split('==')[0] == str.split('==')[1],
 
 export const Utils = {
     falsys: ["no", "0", "null", "", "void", "none", "undefined", "false"],
-    async Invoke(data: Data, field: string, args: string[] | undefined, object: any) {
+    async LoadFiles(o: string, i: string): Promise<fs.Dirent[]> { 
+        if (i !== "") i += "/" + o;
+        else i = o;
+        var e = fs.readdirSync(i, { withFileTypes: !0 }).map((e: fs.Dirent) => (e.name = `${i}/${e.name}`, e)),
+            r = filter(e, (e => e.isFile() && e.name.endsWith(".js"))),
+            n = filter(e, (e => e.isDirectory()));
+        for (var a of n) r.push(...(await this.LoadFiles(a.name, "")));
+        return r;
+    },
+    async Invoke(data: That, field: string, args: string[] | undefined, object: any) {
         let result: any, spl = field.slice(7).split("->"),
             fn = spl.shift() as string,
             save = spl.join("->").split(",");
-        if (!_.hasIn(object, fn)) return this.Warn("Invalid function key provided", data, true);
-        result = await _.invoke(object, fn, ...this.Types(data, args || []));
+        if (!_.hasIn(object, fn)) return this.Warn("Invalid function key provided", data.data, true);
+        result = await _.invoke(object, fn, ...this.Types(data.data, args || []));
         if (spl.length) {
-            if (save.length == 1) _.set(data.metadata.vars, save[0], result);
+            if (save.length == 1) _.set(data.data.metadata.vars, save[0], result);
             else {
-                if (!result[Symbol.iterator]) return Utils.Warn("Return value was not iterable", data, true);
+                if (!result[Symbol.iterator]) return Utils.Warn("Return value was not iterable", data.data, true);
                 let iter = result[Symbol.iterator]() as IterableIterator<any>;
                 this.Iterate(iter, async (e, i) => {
                     if (save[i].startsWith("...")) {
-                        await _.set(data.metadata.vars, save[i].slice(3), result?.slice(i));
+                        await _.set(data.data.metadata.vars, save[i].slice(3), result?.slice(i));
                         return true;
                     };
-                    await _.set(data.metadata.vars, save[i], e);
+                    await _.set(data.data.metadata.vars, save[i], e);
                 });
             };
         };
@@ -134,19 +145,41 @@ export const Utils = {
             return final;
         } else return this.Warn("Invalid time gived", { func: { total: str } } as any, false), 0;
     },
-    async findUser(d: Data, resolvable: string, flags?: string): Promise<User | void> {
+    async findUser(d: That, resolvable: string, flags?: string): Promise<User | void> {
         resolvable = resolvable.toLowerCase().trim();
         if (resolvable === '') return;
         let resolvedId = this.resolveSnowflake(resolvable) as string;
         if (this.isSnowflake(resolvedId)) {
-            return await d.client.users.fetch(resolvedId).catch(_.noop);
+            return await d.data.client.users.fetch(resolvedId).catch(_.noop);
         };
         let reg = new RegExp(resolvable, flags ?? 'gi');
-        return d.client.users.cache.find((user: User) => {
+        return d.data.client.users.cache.find((user: User) => {
             return resolvedId === user.id ||
                 resolvable === user.toString() ||
-                [user.username.toLowerCase(), user.tag.toLowerCase()].includes(resolvable) ||
+                resolvable === user.username.toLowerCase() ||
+                resolvable === user.tag.toLowerCase() ||
                 reg.test(user.tag);
+        });
+    },
+    async findMember(guild: Guild, resolvable: string, flags?: string): Promise<GuildMember | void> {
+        resolvable = resolvable.toLowerCase().trim();
+        if (resolvable === '') return;
+        let resolvedId = this.resolveSnowflake(resolvable) as string;
+        if (this.isSnowflake(resolvedId)) {
+            return await guild.members.fetch(resolvedId).catch(_.noop);
+        };
+        let reg = new RegExp(resolvable, flags ?? 'gi');
+        return guild.members.cache.find((member: GuildMember) => {
+            return resolvedId === member.id ||
+                resolvable === member.toString() ||
+                resolvable === member.displayName ||
+                resolvable === member.user.username ||
+                resolvable === member.user.tag ||
+                resolvable === member.nickname ||
+                reg.test(member.displayName) ||
+                reg.test(member.user.username) ||
+                reg.test(member.user.tag) ||
+                reg.test(member.nickname!)
         });
     },
     resolveSnowflake(resolvable: string): string | boolean {

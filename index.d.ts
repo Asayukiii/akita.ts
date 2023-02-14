@@ -6,6 +6,7 @@ import { FunctionBuilder } from "./src/classes/builder";
 import type { Context } from "./src/classes/context";
 import { AkitaClient } from "src/main";
 
+export type Typeof = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "any";
 export type CommandType = "MESSAGE" | "INTERACTION" | "MEMBER_ADD" | "MEMBER_REMOVE"
 export type Falsy = false | void | "" | 0 | null | undefined
 export type Truthy<T> = T extends Falsy ? never : T;

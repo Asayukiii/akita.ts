@@ -1,12 +1,14 @@
 # **$startsWith**
 > **Checks if string starts with the given target string** <br/>
-> $startsWith[text;target;position?]
+> $startsWith[string;target;position?]
 - - -
 
 ### Fields
 | name | description | type | required |
 |------|-------------|------|----------|
-| Name | Unknown | String | True |
+| String | Unknown | String | True |
+| Target | Unknown | String | True |
+| Position | Unknown | Number | True |
 
 ### Returns
 > Boolean

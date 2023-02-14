@@ -1,8 +1,9 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 import { Utils } from "../../classes/utils";
+import { That } from "src/classes/data";
+import { get } from "lodash";
 import { inspect } from "util";
-import lodash from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -16,14 +17,24 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$ctx[data.guild;id]')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        d.func = await d.func.resolve_fields(d);
-        let fields = d.interpreter.fields(d), r;
-        if (fields[0].startsWith("invoke:")) r = await Utils.Invoke(d, fields[0], fields.slice(1), d.metadata.ctx);
-        else r = fields.length ? lodash.get(d.metadata.ctx, fields.join(".")) : d.metadata.ctx;
-        r ||= "undefined";
-        return {
-            code: d.code?.replace(d.func.id, typeof r == "string" ? r : inspect(r, { depth: Infinity }))
-        };
+    code: async function (this: That) {
+        await this.resolveFields()
+        let fields = this.fields.split(true) as string[], result = "undefined"
+        if (fields[0].startsWith("invoke"))
+            result = await Utils.Invoke(this, fields.shift()!, fields, this.data.metadata.ctx)
+        else 
+            result = fields.length ? get(this.data.metadata.ctx, fields.join(".")) : this.data.metadata.ctx
+        result ||= "undefined"
+        return this.makeReturn(typeof result === "string" ? result : inspect(result, { depth: null })) 
+        // d.func = await d.func.resolve_fields(d);
+        // let fields = d.interpreter.fields(d), r;
+        // if (fields[0].startsWith("invoke:"))
+        //     r = await Utils.Invoke(d, fields[0], fields.slice(1), d.metadata.ctx);
+        // else
+        //     r = fields.length ? lodash.get(d.metadata.ctx, fields.join(".")) : d.metadata.ctx;
+        // r ||= "undefined";
+        // return {
+        //     code: d.code?.replace(d.func.id, typeof r == "string" ? r : inspect(r, { depth: Infinity }))
+        // };
     }
 }

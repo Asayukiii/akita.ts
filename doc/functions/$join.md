@@ -15,5 +15,5 @@
 ### Example
 > ```php
 $var[array;["hola!", "sabias", "que", "hablo", "español?"]]
-$join[array] // hola! sabias que hablo español?
+$join[array; ] // hola! sabias que hablo español?
 ```

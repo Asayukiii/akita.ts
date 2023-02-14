@@ -13,5 +13,5 @@
 
 ### Example
 > ```php
-$escape[$var[some;im will not execute]]
+$escape[$var[some;im will not a normal person pls help]]
 ```

@@ -1,7 +1,8 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 import { Utils } from "../../classes/utils";
-import lodash from "lodash";
+import { That } from "src/classes/data";
+import { get } from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -16,14 +17,16 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$author[id]\n\n// using funcs\n$author[invoke:displayAvatarURL->avatar;{ size: 2048 }]')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        d.func = await d.func.resolve_fields(d);
-        let fields = d.interpreter.fields(d), r: any = undefined, usr = d.metadata.ctx.getUser();
-        if (!usr) return Utils.Warn("This context doesn't have author!", d, true);
-        if (fields[0]?.startsWith("invoke:")) r = await Utils.Invoke(d, fields[0], fields.slice(1), usr);
-        else r = fields.length ? lodash.get(usr.toJSON(), fields.join(".")) : usr.toJSON();
-        return {
-            code: d.code?.replace(d.func.id, r)
-        };
+    code: async function (this: That) {
+        await this.resolveFields()
+        let fields = this.fields.split(true),
+            result: any = "undefined",
+            user = this.meta.ctx.getUser()
+        if (!user) return this.warn("This context doesn't have author!")
+        if (fields[0]?.startsWith("invoke:"))
+            result = await Utils.Invoke(this, fields[0], fields.slice(1), user);
+        else
+            result = fields.length ? get(user, fields.join(".")) : user;
+        this.makeReturn(result)
     }
 }

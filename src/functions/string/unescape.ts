@@ -1,5 +1,6 @@
 import { FunctionBuilder } from "../../classes/builder";
 import { SourceFunction, Data } from "../../../index";
+import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -12,10 +13,8 @@ export const data: SourceFunction = {
         }])
         .setValue('example', 'None')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        return {
-            code: d.code?.replace(d.func.id, d.func.inside?.unescape()!)
-        };
+    code: async function (this: That): Promise<{ code: any; }> {
+        await this.resolveFields()
+        return this.makeReturn(this.inside?.unescape())
     }
 }

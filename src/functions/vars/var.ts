@@ -4,6 +4,7 @@ import { SourceFunction, Data } from "../../../index";
 import { inspect } from "util";
 import lodash from "lodash";
 import Hjson from "hjson";
+import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -25,13 +26,14 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$var[str;hi, im a string] // string var\n$var[num;4] // number var\n$var[obj;{ "leif": "erikson" }] // object var')
         .setValue('returns', 'String'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let fields = d.interpreter.fields(d) as [string, any, string], [key, value, type = "unknown"] = fields;
+    code: async function (this: That) {
+        await this.resolveFields()
+        let fields = this.fields.split(true) as [string, any, string],
+            [key, value, type = "unknown"] = fields;
         if (key.startsWith("invoke:")) {
-            value = await Utils.Invoke(d, key, fields.slice(1), d.metadata.vars);
-            return { code: d.code?.replace(d.func.id, value) };
-        };
+            value = await Utils.Invoke(this, key, fields.slice(1), this.data.metadata.vars);
+            return this.makeReturn(value)
+        }
         if (value) {
             type = type.toLowerCase();
             if (type == "number" || type != "string" && type != "bigint" && !isNaN(value))
@@ -45,13 +47,11 @@ export const data: SourceFunction = {
                 try {
                     value = Hjson.parse(value);
                 } catch (e) {
-                    if (type == "json") return Utils.Warn("Invalid JSON provided", d, true);
+                    if (type == "json")
+                        return this.warn("Invalid JSON provided")
                 }
-            lodash.set(d.metadata.vars, key, value);
-        };
-        let v = lodash.get(d.metadata.vars, key, "undefined");
-        return {
-            code: d.code?.replace(d.func.id, typeof v == "string" ? v : inspect(v, { depth: Infinity }))
-        };
+            this.setVariable(key, value)
+        }
+        return this.makeReturn(this.variable(key))
     }
 }

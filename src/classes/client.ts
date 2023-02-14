@@ -7,6 +7,8 @@ import { Interpreter } from "./interpreter";
 import msg_event from "../handlers/message";
 import { Timeouts } from "midou.ts";
 import { Client } from "discord.js";
+import { Utils } from "./utils";
+import { cwd } from "process";
 
 export class AkitaClient extends Client {
     public timeouts = new Timeouts({ restore: true });
@@ -26,7 +28,7 @@ export class AkitaClient extends Client {
             setTimeout(() => this.isReady() || console.log("CLIENT CAN NOT START!".bgRed), 1e4);
         });
         this.on("functionError", (error: Error, d: Data) => {
-            console.log(`${"InternalError".bgRed} ${"in".gray} ${(d.func?.total || "unknown").bgRed}:\n    ${">".gray} ${(error.stack || "Without Stack").gray}`)
+            console.log(`${"InternalError".bgRed} ${"in".gray} ${(d.func?.total || "unknown").bgRed}${":".gray}\n    ${">".gray} ${(error.stack || "Without Stack").gray}`)
         })
     };
     async resolve(code: string, data: Record<string | number | symbol, any> | undefined, client: AkitaClient = this): Promise<Data | undefined> {
@@ -66,13 +68,32 @@ export class AkitaClient extends Client {
         });
     };
     public addCommand({ names, type, code }: { names: string | string[]; type: CommandType; code: string; }): this {
+        type = type.trim().toUpperCase().replace(/ +/g, "_") as CommandType;
+        names = Array.isArray(names) ? names : [names];
+        console.log(`${"DEBUG".bgBlack} ${"-> Loaded".gray} ${names[0].bgWhite} ${"as".gray} ${type.bgWhite}!`);
         return this.commands.push({
-            names: Array.isArray(names) ? names : [names],
-            type, code
+            names, type, code
         }), this;
     };
-    public getCommands(name: string): Command | undefined {
-        return this.commands.find((command: Command) => command.names?.includes(name));
+    public addCommands(cmds: { names: string | string[]; type: CommandType; code: string; }[]) {
+        return cmds.forEach(this.addCommand), this;
+    };
+    public loadCommands(folder: string, initial: string = cwd()) {
+        Utils.LoadFiles(folder, initial).then(res => {
+            res.forEach(el => {
+                try {
+                    const cmd = require(el.name);
+                    this.addCommands(Array.isArray(cmd) ? cmd : [cmd]);
+                } catch (error: any) {
+                    console.log(`${"LoaderError".bgRed} ${"in".gray} ${(el.name || "unknown").bgRed}${":".gray}\n    ${">".gray} ${(error.stack || "Without Stack").gray}`)
+                };
+            });
+        });
+    };
+    public getCommands(type: CommandType, name: string, method: "filter" | "find" = "find"): Command[] | Command | undefined {
+        return this.commands[method](
+            (command: Command) => command.type === type && command.names?.includes(name)
+        );
     };
     public addCallback(name: string, code: string) {
         this.cbs[name] = code;

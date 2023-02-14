@@ -2,8 +2,9 @@ import { FunctionBuilder } from "../../classes/builder";
 import { SourceFunction, Data } from "../../../index";
 import { Utils } from "../../classes/utils";
 import lodash from "lodash";
+import { That } from "src/classes/data";
 
-function warp (a: string, b: number, c: string): string {
+function warp(a: string, b: number, c: string): string {
     return a.length > b ? a.slice(0, b) + c : a;
 };
 
@@ -25,20 +26,15 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$warp[totbl its the best;5] // totbl...\n//$warp[var:key;...] for variables, this mutates the variable')
         .setValue('returns', 'String'),
-    code: async (d: Data) => {
-        d.func = await d.func!.resolve_fields(d);
-        let [s, l, e = "..."] = d.interpreter.fields(d);
-        if (s.startsWith("var:")) {
-            s = s.slice(4);
-            let value = lodash.get(d.metadata.vars, s);
-            if (typeof value != "string") return Utils.Warn(`Variable ${s.bgYellow} is not a string`, d);
-            lodash.set(d.metadata.vars, s, lodash.upperCase(value));
-            return {
-                code: d.code?.replace(d.func.id, lodash.get(d.metadata.vars, warp(s, Number(l) || 0, e)))
-            };
-        };
-        return {
-            code: d.code?.replace(d.func.id, warp(s, Number(l) || 0, e))
-        };
+    code: async function (this: That): Promise<void | { code: string; }> {
+        await this.resolveFields()
+        let [string, limit, ellipsis = "..."] = this.fields.split(true) as string[]
+        if (string.startsWith("var:")) {
+            string = string.slice(4)
+            let value = this.variable(string)
+            if (typeof value !== "string") return this.warn(`Variable ${string.bgYellow} is not a string`)
+            return this.makeReturn(this.setVariable(string, warp(string, Number(limit) || 0, ellipsis)))
+        }
+        return this.makeReturn(warp(string, Number(limit) || 0, ellipsis))
     }
 }

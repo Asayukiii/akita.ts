@@ -2,7 +2,9 @@ import { SourceFunction, Data, Falsy } from "../../index";
 import { Compiler, FnD } from "./compiler";
 import { Container } from "./container";
 import { AkitaClient } from "./client";
+import { Fields } from "./fields";
 import { Utils } from "./utils";
+import { That } from "./data";
 import lodash from "lodash";
 import fs from "fs";
 
@@ -65,28 +67,32 @@ export class Interpreter {
                 break: !!d?.break,
                 func: {} as FnD,
                 client
-            };
+            }, fields = new Fields(data), that = new That(data, fields);
             for (const fn of Object.values(this.compiler.matched!).reverse()) {
                 if (data.break) break;
-                data = await this.run_function(fn, data) || data;
+                // @ts-ignore
+                data = await this.run_function(fn, that) || data;
             };
             return data;
         };
     };
-    public async run_function(fn: FnD, d: Data): Promise<Data> {
+    public async run_function(fn: FnD, d: That): Promise<Data> {
         try {
             let finded = this.functions.find(i => i.data.name == fn.name);
             if (finded) {
-                fn.resolve_fields = this.resolve_fields; fn.resolve_field = this.resolve_field; d.func = fn;
-                const reject = await finded.code(d);
+                fn.resolve_fields = this.resolve_fields;
+                fn.resolve_field = this.resolve_field;
+                d.data.func = fn;
+                const reject = await finded.code.apply(d, [d.data]);
                 if (reject?.code) {
-                    d.code = reject!.code?.trim() || "";
+                    d.data.code = reject.code.trim() || "";
                 };
             };
-            return d;
+            return d.data;
         } catch ($: unknown) {
-            d.client.emit("functionError", $ as Error, d);
-            return d;
+            console.log($)
+            d.data.client?.emit("functionError", $ as Error, d);
+            return d.data;
         };
     };
     public async _(fn: FnD) {

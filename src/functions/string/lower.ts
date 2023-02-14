@@ -1,7 +1,7 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-import { Utils } from "../../classes/utils";
-import lodash from "lodash";
+import { SourceFunction } from "../../../index";
+import { That } from "src/classes/data";
+import { lowerCase } from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -14,18 +14,14 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$lower[HI] // hi\n$lower[var:NAME] // convers string value to lower case')
         .setValue('returns', 'String'),
-    code: async (d: Data) => {
-        d.func = await d.func!.resolve_fields(d);
-        if (d.func.inside?.startsWith("var:")) {
-            var key = d.func.inside.slice(4), value = lodash.get(d.metadata.vars, key);
-            if (typeof value != "string") return Utils.Warn(`Variable ${key.bgYellow} is not a string`, d);
-            lodash.set(d.metadata.vars, key, lodash.lowerCase(value));
-            return {
-                code: d.code?.replace(d.func.id, lodash.get(d.metadata.vars, key))
-            };
-        };
-        return {
-            code: d.code?.replace(d.func.id, d.func.inside?.toLowerCase()!)
-        };
+    code: async function (this: That): Promise<void | { code: string; }> {
+        await this.resolveFields();
+        if (this.inside?.startsWith("var:")) {
+            this.inside = this.inside.slice(4)
+            let value = this.variable(this.inside)
+            if (typeof value !== "string") return this.warn(`Variable ${this.inside.bgYellow} is not a string`)
+            return this.makeReturn(this.setVariable(this.inside, lowerCase(value)))
+        }
+        return this.makeReturn(lowerCase(this.inside?.unescape()))
     }
 }

@@ -1,7 +1,7 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-import { Utils } from "../../classes/utils";
-import lodash from "lodash";
+import { SourceFunction } from "../../../index";
+import { That } from "src/classes/data";
+import { deburr } from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -14,18 +14,14 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$deburr[Hí Máxîm] // Hi Maxim')
         .setValue('returns', 'String'),
-    code: async (d: Data) => {
-        d.func = await d.func!.resolve_fields(d);
-        if (d.func.inside?.unescape()?.startsWith("var:")) {
-            var n = d.func.inside.unescape().slice(4), value = lodash.get(d.metadata.vars, n);
-            if (typeof value != "string") return Utils.Warn(`Variable ${n.bgYellow} is not a string`, d);
-            lodash.set(d.metadata.vars, n, lodash.deburr(value));
-            return {
-                code: d.code?.replace(d.func.id, lodash.get(d.metadata.vars, n))
-            };
-        };
-        return {
-            code: d.code?.replace(d.func.id, lodash.deburr(d.func.inside?.unescape()))
-        };
+    code: async function (this: That): Promise<void | { code: string; }> {
+        await this.resolveFields();
+        if (this.inside?.startsWith("var:")) {
+            this.inside = this.inside.slice(4)
+            let value = this.variable(this.inside)
+            if (typeof value !== "string") return this.warn(`Variable ${this.inside.bgYellow} is not a string`)
+            return this.makeReturn(this.setVariable(this.inside, deburr(value)))
+        }
+        return this.makeReturn(deburr(this.inside?.unescape()))
     }
 }
