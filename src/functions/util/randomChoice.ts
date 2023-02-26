@@ -1,24 +1,22 @@
-import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-// import { Utils } from "../../classes/utils";
-import { random } from "lodash";
+import { FunctionBuilder } from "../../classes/builder"
+import { SourceFunction } from "../../../index"
+import { That } from "src/classes/data"
+import { random } from "lodash"
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('randomNumber')
+        .setName('randomChoice')
         .setValue('description', '...')
-        .setValue('use', '$random[...choices]')
+        .setValue('use', '$randomChoices[...choices]')
         .setValue('fields', [{
-            name: 'min',
-            type: 'number'
+            name: 'choices',
+            type: 'any'
         }])
-        .setValue('example', '$random[a;b;c;d] // random value')
+        .setValue('example', '$randomChoice[a;b;c;d] // random value')
         .setValue('returns', 'Any'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let choices = d.interpreter.fields(d);
-        return {
-            code: d.code?.replace(d.func.id, choices[random(choices.length)])
-        };
+    code: async function (this: That) {
+        await this.resolveFields()
+        let choices = this.fields.split(true)
+        return this.makeReturn(choices[random(choices.length)])
     }
 }

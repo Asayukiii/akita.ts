@@ -1,10 +1,10 @@
 // imports
-import {
+import { MessageOptions } from "child_process";
+import djs, {
     AutocompleteInteraction,
     ButtonComponentData,
+    InteractionResponse,
     APIButtonComponent,
-    SelectMenuBuilder,
-    AttachmentBuilder,
     ActionRowBuilder,
     BaseInteraction,
     ButtonBuilder,
@@ -15,19 +15,20 @@ import {
     APIEmbed,
     Message,
     User,
+    Interaction,
 } from "discord.js";
 import lodash from "lodash";
 
 // exports
 export class Container {
-    public data: Record<string, any> = {
+    public data: any = {
         fetchReply: false,
         ephemeral: false,
-        attachments: [],
-        components: [],
+        attachments: [] as any[],
+        components: [] as any[],
         content: null,
-        embeds: [],
-        files: []
+        embeds: [] as any[],
+        files: [] as any[]
     };
     public replyType = "send";
     public instance: any = null;
@@ -47,18 +48,27 @@ export class Container {
     public addButton(data: Partial<ButtonComponentData> | Partial<APIButtonComponent> | undefined, index = -1): this {
         return this.data.components.at(index).components.push((new ButtonBuilder(data))), this;
     };
-    public addMenu(data: any): this {
-        return this.data.components.at(-1).components.push((new SelectMenuBuilder(data))), this;
-    };
-    public async send({ content = this.data.content, ins = this.instance } = {}, reset = true): Promise<any> {
+    public addMenu(
+        type: "String" | "User" | "Role" | "Channel" | "Mentionable",
+        data: any,
+        index = -1
+    ): this {
+        this.data.components.at(index).components.push((new djs[`${type}SelectMenuBuilder`](data)))
+        return this
+    }
+    public async send({
+        content = this.data.content,
+        ins = this.instance
+    } = {}, reset = true): Promise<null | Message | InteractionResponse> {
         if (ins) {
             this.data.content = content;
-            var data: any = null;
+            var data = null as unknown
             if (ins instanceof BaseInteraction) {
                 if (ins instanceof AutocompleteInteraction)
                     data = ins.respond([]).catch(lodash.noop);
                 else {
-                    (this.replyType != "reply" && (this.replyType = "reply")), (ins.isRepliable() && ins.deferred && (this.replyType = 'editReply'));
+                    (this.replyType != "reply" && (this.replyType = "reply")),
+                        (ins.isRepliable() && ins.deferred && (this.replyType = 'editReply'));
                 };
                 data = await ins[this.replyType]?.(this.data).catch(lodash.noop);
             } else if (ins instanceof Message) {
@@ -68,7 +78,8 @@ export class Container {
                     .send(this.data)
                     .catch(lodash.noop);
             };
-            return (reset && this.reset()), data ?? null;
+            reset && this.reset()
+            return data as Message || null;
         } else return null;
     };
 };

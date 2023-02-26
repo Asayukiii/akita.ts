@@ -5,6 +5,7 @@ import { Application, Request, Response } from "express";
 import { FunctionBuilder } from "./src/classes/builder";
 import type { Context } from "./src/classes/context";
 import { AkitaClient } from "src/main";
+import { That } from "src/classes/data";
 
 export type Typeof = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "any";
 export type CommandType = "MESSAGE" | "INTERACTION" | "MEMBER_ADD" | "MEMBER_REMOVE"
@@ -41,7 +42,7 @@ export interface FunctionBuilderData {
 
 export interface SourceFunction {
     data: FunctionBuilderData | FunctionBuilder
-    code: (data: Data) => Promise<{ code: string } | void>
+    code: (this: That, data: Data) => Promise<{ code: string } | void>
 }
 
 export class Interpreter {

@@ -1,5 +1,6 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
+import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -22,14 +23,12 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$setTitle[0;discord!;https://discord.com/]')
         .setValue('returns', 'Void'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let [index = 0, title, url = null] = d.interpreter.fields(d);
+    code: async function (this: That) {
+        await this.resolveFields()
+        let [index = 0, title, url = null] = this.fields.split(true) as [number, string, string]
         index = Number(index);
-        if (!d.metadata.ctn.data.embeds[index]) d.metadata.ctn.addEmbed();
-        d.metadata.ctn.data.embeds[index].setTitle(title).setURL(url);
-        return {
-            code: d.code?.replace(d.func.id, "")
-        };
+        if (!this.meta.ctn.data.embeds[index]) this.meta.ctn.addEmbed()
+        this.meta.ctn.data.embeds[index].setTitle(title).setURL(url)
+        return this.makeReturn("")
     }
 }

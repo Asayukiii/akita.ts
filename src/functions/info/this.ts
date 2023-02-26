@@ -4,19 +4,19 @@ import { get } from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('data')
-        .setValue('description', 'get interpreter data')
-        .setValue('use', '$data[key?]')
+        .setName('this')
+        .setValue('description', 'get data from the thisArg')
+        .setValue('use', '$this[key?]')
         .setValue('fields', [{
             name: 'key',
             type: 'string',
             optional: true
         }])
-        .setValue('example', '$data[metadata;vars]')
+        .setValue('example', '$this')
         .setValue('returns', 'Unknown'),
     code: async function () {
         await this.resolveFields()
-        let result = this.inside ? get(this.data, this.fields.split(true).join(".")) : this.data;
+        let result = this.inside ? get(this, this.fields.split(true).join(".")) : this;
         return this.makeReturn(typeof result === "string" ? result : result?.toString ? result.toString() as string : JSON.stringify(result))
     }
 }

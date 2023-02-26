@@ -20,10 +20,8 @@ export const data: SourceFunction = {
     code: async function (this: That) {
         await this.resolveFields()
         let fields = this.fields.split(true) as string[], result = "undefined"
-        if (fields[0].startsWith("invoke"))
-            result = await Utils.Invoke(this, fields.shift()!, fields, this.data.metadata.ctx)
-        else 
-            result = fields.length ? get(this.data.metadata.ctx, fields.join(".")) : this.data.metadata.ctx
+        if (fields[0].startsWith("invoke:")) result = await Utils.Invoke(this, fields.shift()!, fields, this.meta.ctx)
+        else result = fields.length ? get(this.meta.ctx, fields.join(".")) : this.meta.ctx
         result ||= "undefined"
         return this.makeReturn(typeof result === "string" ? result : inspect(result, { depth: null })) 
         // d.func = await d.func.resolve_fields(d);

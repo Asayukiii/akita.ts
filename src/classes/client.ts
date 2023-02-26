@@ -67,23 +67,22 @@ export class AkitaClient extends Client {
             int_event(int, this);
         });
     };
-    public addCommand({ names, type, code }: { names: string | string[]; type: CommandType; code: string; }): this {
-        type = type.trim().toUpperCase().replace(/ +/g, "_") as CommandType;
-        names = Array.isArray(names) ? names : [names];
-        console.log(`${"DEBUG".bgBlack} ${"-> Loaded".gray} ${names[0].bgWhite} ${"as".gray} ${type.bgWhite}!`);
-        return this.commands.push({
-            names, type, code
-        }), this;
+    public addCommand(cmd: Command): this {
+        cmd.type = cmd.type.trim().toUpperCase().replace(/ +/g, "_") as CommandType
+        cmd.names = Array.isArray(cmd.names) ? cmd.names : [cmd.names] as unknown as string[]
+        console.log(`${"DEBUG".bgBlack} ${"-> Loaded".gray} ${cmd.names[0].bgWhite} ${"as".gray} ${cmd.type.bgWhite}!`)
+        return this.commands.push(cmd), this
     };
-    public addCommands(cmds: { names: string | string[]; type: CommandType; code: string; }[]) {
-        return cmds.forEach(this.addCommand), this;
+    public addCommands(cmds: Command[]) {
+        return cmds.forEach((cmd) => this.addCommand(cmd)), this
     };
     public loadCommands(folder: string, initial: string = cwd()) {
         Utils.LoadFiles(folder, initial).then(res => {
             res.forEach(el => {
                 try {
-                    const cmd = require(el.name);
-                    this.addCommands(Array.isArray(cmd) ? cmd : [cmd]);
+                    let cmds = require(el.name)
+                    cmds = Array.isArray(cmds) ? cmds : [cmds]
+                    for (const cmd of cmds) this.addCommand(cmd)
                 } catch (error: any) {
                     console.log(`${"LoaderError".bgRed} ${"in".gray} ${(el.name || "unknown").bgRed}${":".gray}\n    ${">".gray} ${(error.stack || "Without Stack").gray}`)
                 };

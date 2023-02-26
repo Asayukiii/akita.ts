@@ -1,7 +1,8 @@
-import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-import { inspect } from "util";
-import { get } from "lodash";
+import { FunctionBuilder } from "../../classes/builder"
+import { SourceFunction } from "../../../index"
+import { That } from "src/classes/data"
+import { inspect } from "util"
+import { get } from "lodash"
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -16,19 +17,16 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '// my msg: !some-command hi, im sdlg and i hate mid\n$args // all args (hi, im sdlg)\n$args[n] // specific argument ($args[0] = hi,)\n$args[n..m?] // slice arguments ($args[2..4] = sdlg and i)\n$args[length] // arguments size')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        d.func = await d.func.resolve_fields(d);
-        let f = d.interpreter.fields(d), r;
-        if (f[0]?.includes("..")) {
-            let [
-                from = 0,
-                to
-            ] = f.shift()!.split("..");
-            r = d.metadata.args.slice(Number(from), to.trim() == "" ? undefined : Number(to));
-            r = f.length > 0 ? get(r, f.join(".")) : r.join(" ");
-        } else r = f.length > 0 ? get(d.metadata.args, f.join(".")) : d.metadata.args.join(" ");
-        return {
-            code: d.code?.replace(d.func.id, typeof r == "string" ? r : inspect(r, { depth: Infinity }) || "")
-        };
+    code: async function (this: That) {
+        await this.resolveFields()
+        let fields = this.fields.split(true)
+        if (fields[0]?.includes("..")) {
+            let [from = 0, to] = fields.shift()!.split("..")
+            var result = this.meta.args.slice(Number(from), to.trim() == "" ? undefined : Number(to))
+            result = fields.length > 0 ? get(result, fields.join(".")) : result.join(" ")
+        } else { 
+            var result = fields.length > 0 ? get(this.meta.args, fields.join(".")) : this.meta.args.join(" ")
+        }
+        return this.makeReturn(typeof result === "string" ? result : inspect(result, { depth: Infinity }) || "")
     }
-};
+}

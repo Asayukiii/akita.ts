@@ -1,6 +1,7 @@
 import { FunctionBuilder } from "../../classes/builder";
 import { SourceFunction, Data } from "../../../index";
 import { EmbedBuilder } from "discord.js";
+import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -23,17 +24,12 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$setFooter[0;$author[tag];$author[displayAvatarURL]]')
         .setValue('returns', 'Void'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let [index = 0, text, icon] = d.interpreter.fields(d);
+    code: async function (this: That) {
+        await this.resolveFields()
+        let [index = 0, text, iconURL] = this.fields.split(true) as [number, string, string]
         index = Number(index);
-        if (!d.metadata.ctn.data.embeds[index]) d.metadata.ctn.addEmbed();
-        (d.metadata.ctn.data.embeds[index] as EmbedBuilder).setFooter({
-            text: text,
-            iconURL: icon
-        });
-        return {
-            code: d.code?.replace(d.func.id, "")
-        };
+        if (!this.meta.ctn.data.embeds[index]) this.meta.ctn.addEmbed()
+        this.meta.ctn.data.embeds[index].setFooter({ text, iconURL })
+        return this.makeReturn("")
     }
 };

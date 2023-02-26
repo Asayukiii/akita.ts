@@ -1,5 +1,5 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -13,11 +13,9 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$setContent[stop crying mid!!]')
         .setValue('returns', 'Void'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        d.metadata.ctn.data.content = d.interpreter.fields(d).join(";");
-        return {
-            code: d.code.replace(d.func.id, "")
-        };
+    code: async function () {
+        await this.resolveFields()
+        this.meta.ctn.data.content = this.inside?.unescape().trim()
+        return this.makeReturn("")
     }
 }

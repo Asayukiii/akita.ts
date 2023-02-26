@@ -1,6 +1,7 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 import { Utils } from "../../classes/utils";
+import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -13,13 +14,10 @@ export const data: SourceFunction = {
             type: 'boolean',
         }])
         .setValue('example', '$send[no]')
-        .setValue('returns', 'returnId ? Number : Void'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let [rid = "no"] = d.interpreter.fields(d);
-        let result = await d.metadata.ctn.send();
-        return {
-            code: d.code?.replace(d.func?.id!, Utils.booleanify(rid) ? result.id : "")
-        };
+        .setValue('returns', 'returnId ? Snowflake : Void'),
+    code: async function (this: That) {
+        await this.resolveFields()
+        let result = await this.meta.ctn.send();
+        return this.makeReturn(Utils.booleanify(this.inside!) ? result?.id : "")
     }
 };

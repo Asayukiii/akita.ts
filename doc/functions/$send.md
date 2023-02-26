@@ -9,7 +9,7 @@
 | ReturnId | Whether or not to return message Id `(default: no)` | Boolean | True |
 
 ### Returns
-> ReturnId ? Number : Void
+> ReturnId ? Snowflake : Void
 
 ### Example
 > ```php

@@ -3,9 +3,13 @@ import { Context } from "../classes/context";
 import type { Message } from "discord.js";
 import { Command } from "index";
 
-export default function (msg: Message, client: AkitaClient, options?: any) {
-    let prefix = client.prefixes?.find((p) => msg.content.startsWith(p)),
-        ctx = new Context(msg),
+export default async function (msg: Message, client: AkitaClient, options?: any) {
+    let ctx = new Context(msg),
+        prefixes = client.prefixes?.map(async prefix => {
+            if (prefix.includes("$")) return (await client.resolve(prefix, { metadata: { msg, prefix, ctx } }))?.code
+            return prefix
+        }),
+        prefix = await prefixes?.find(async prefix => msg.content.startsWith((await prefix)!)),
         any_exec = client.getCommands("MESSAGE", "$any", "filter") as Command[];
     if (any_exec.length && (options?.bots == true ? true : !msg.author.bot)) {
         let args = msg.content.trim().split(/ +/g);

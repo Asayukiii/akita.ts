@@ -35,7 +35,7 @@ export class Fields {
      * @returns the first field
      */
     public shift(resolve: boolean = false) {
-        let that = this.fields.shift();
+        let that = this.fields.shift().unescape()
         return resolve ? Utils.Types(this.data, [that] as string[]) : that
     }
     /**
@@ -63,9 +63,9 @@ export class Fields {
      * @param {number | undefined} end  where end
      * @returns (string | number | bigint | object | RegExp)[]
      */
-    public split(unescape: boolean | object = true, start: number | undefined = 0, end: number | undefined = this.fields.length): any[] {
+    public split(unescape: boolean = true, start: number | undefined = 0, end: number | undefined = this.fields.length): any[] {
         return this.fields.slice(start, end).map(f => {
-            return typeof f === "string" ? f.unescape() : f
+            return unescape && typeof f === "string" ? f.unescape() : f
         })
     }
 };

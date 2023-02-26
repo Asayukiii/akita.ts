@@ -34,7 +34,7 @@ export class That {
      * @param {any} value replacer for the current ID (recommended use strings)
      * @returns \{ code: string }
      */
-    public makeReturn(value: any): { code: string } {
+    public makeReturn<T extends any>(value: T): { code: string } {
         this.data.code = this.data.code.replace(this.id, value)
         return { code: this.data.code }
     }

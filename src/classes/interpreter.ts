@@ -37,6 +37,7 @@ export class Interpreter {
                     over.resolve_fields = this.resolve_fields;
                     over.resolve_field = this.resolve_field;
                     let new_data = { ...data, func: over, code: data.func!.fields![index].value }
+                    // @ts-ignore
                     const reject = await finded.code(new_data);
                     if (reject?.code && data.func?.inside && data.func.fields) {
                         data.func.fields[index].value = reject.code;
@@ -67,11 +68,11 @@ export class Interpreter {
                 break: !!d?.break,
                 func: {} as FnD,
                 client
-            }, fields = new Fields(data), that = new That(data, fields);
+            }
             for (const fn of Object.values(this.compiler.matched!).reverse()) {
                 if (data.break) break;
                 // @ts-ignore
-                data = await this.run_function(fn, that) || data;
+                data = await this.run_function(fn, new That(data, new Fields(data))) || data;
             };
             return data;
         };
