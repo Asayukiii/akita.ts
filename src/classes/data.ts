@@ -1,5 +1,5 @@
 import type { FnD } from "./compiler"
-import type { Data } from "index"
+import type { Data, Metadata } from "index"
 import { get, set } from "lodash"
 import { Utils } from "./utils"
 import { Fields } from "./fields"
@@ -12,6 +12,7 @@ export class That {
         this.fields = f
     }
     // util
+    public set meta(value: Metadata) { this.data.metadata = value }
     public get meta() { return this.data.metadata }
     /**
      * send a warning to the console

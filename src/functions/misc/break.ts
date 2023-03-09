@@ -1,5 +1,5 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -13,11 +13,9 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$break')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        d.func.resolve_fields(d);
-        d.break = d.func.inside?.unescape() || true;
-        return {
-            code: d.code.replace(d.func.id, d.break || "")
-        };
+    code: async function () {
+        await this.resolveFields()
+        this.breakBlock()
+        return this.makeReturn(this.data.break)
     }
 }

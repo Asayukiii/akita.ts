@@ -1,9 +1,19 @@
 // imports
-import { MessageOptions } from "child_process";
-import djs, {
+import {
+    MentionableSelectMenuComponentData,
+    ChannelSelectMenuComponentData,
+    StringSelectMenuComponentData,
+    MentionableSelectMenuBuilder,
+    UserSelectMenuComponentData,
+    RoleSelectMenuComponentData,
+    ChannelSelectMenuBuilder,
+    StringSelectMenuBuilder,
+    UserSelectMenuBuilder,
+    RoleSelectMenuBuilder,
     AutocompleteInteraction,
-    ButtonComponentData,
+    MessagePayloadOption,
     InteractionResponse,
+    ButtonComponentData,
     APIButtonComponent,
     ActionRowBuilder,
     BaseInteraction,
@@ -15,19 +25,19 @@ import djs, {
     APIEmbed,
     Message,
     User,
-    Interaction,
 } from "discord.js";
-import lodash from "lodash";
+import lodash from "lodash"
 
 // exports
 export class Container {
-    public data: any = {
+    // @ts-ignore
+    public data: Partial<{ components: ActionRowBuilder[]; embeds: EmbedBuilder[]; content: string } | MessagePayloadOption> = {
         fetchReply: false,
         ephemeral: false,
-        attachments: [] as any[],
-        components: [] as any[],
-        content: null,
-        embeds: [] as any[],
+        attachments: undefined,
+        components: [] as ActionRowBuilder[],
+        content: undefined,
+        embeds: [] as EmbedBuilder[],
         files: [] as any[]
     };
     public replyType = "send";
@@ -37,23 +47,44 @@ export class Container {
         this.data = new Container().data;
     };
     public setInstance<T>(instance: T) {
-        return (this.instance = instance), this;
-    };
+        return (this.instance = instance), this
+    }
     public addEmbed(data?: EmbedData | APIEmbed | undefined): this {
-        return this.data.embeds.push(new EmbedBuilder(data)), this;
-    };
+        if (this.data.embeds) this.data.embeds.push(new EmbedBuilder(data))
+        return this
+    }
     public addRow(): this {
-        return this.data.components.push((new ActionRowBuilder())), this;
-    };
+        if (this.data.components ||= []) this.data.components.push((new ActionRowBuilder() as any))
+        return this
+    }
     public addButton(data: Partial<ButtonComponentData> | Partial<APIButtonComponent> | undefined, index = -1): this {
-        return this.data.components.at(index).components.push((new ButtonBuilder(data))), this;
-    };
-    public addMenu(
-        type: "String" | "User" | "Role" | "Channel" | "Mentionable",
-        data: any,
-        index = -1
-    ): this {
-        this.data.components.at(index).components.push((new djs[`${type}SelectMenuBuilder`](data)))
+        if (this.data.components?.at(index) instanceof ActionRowBuilder)
+            (this.data.components.at(index) as ActionRowBuilder).addComponents(new ButtonBuilder(data))
+        return this
+    }
+    public addStringMenu(data: Partial<StringSelectMenuComponentData>, index = -1): this {
+        if (this.data.components?.at(index) instanceof ActionRowBuilder)
+            (this.data.components.at(index) as ActionRowBuilder).addComponents(new StringSelectMenuBuilder(data))
+        return this
+    }
+    public addUserMenu(data: Partial<UserSelectMenuComponentData>, index = -1): this {
+        if (this.data.components?.at(index) instanceof ActionRowBuilder)
+            (this.data.components.at(index) as ActionRowBuilder).addComponents(new UserSelectMenuBuilder(data))
+        return this
+    }
+    public addRoleMenu(data: Partial<RoleSelectMenuComponentData>, index = -1): this {
+        if (this.data.components?.at(index) instanceof ActionRowBuilder)
+            (this.data.components.at(index) as ActionRowBuilder).addComponents(new RoleSelectMenuBuilder(data))
+        return this
+    }
+    public addChannelMenu(data: Partial<ChannelSelectMenuComponentData>, index = -1): this {
+        if (this.data.components?.at(index) instanceof ActionRowBuilder)
+            (this.data.components.at(index) as ActionRowBuilder).addComponents(new ChannelSelectMenuBuilder(data))
+        return this
+    }
+    public addMentionableMenu(data: Partial<MentionableSelectMenuComponentData>, index = -1): this {
+        if (this.data.components?.at(index) instanceof ActionRowBuilder)
+            (this.data.components.at(index) as ActionRowBuilder).addComponents(new MentionableSelectMenuBuilder(data))
         return this
     }
     public async send({
@@ -72,10 +103,10 @@ export class Container {
                 };
                 data = await ins[this.replyType]?.(this.data).catch(lodash.noop);
             } else if (ins instanceof Message) {
-                data = await ins[this.replyType == 'edit' ? 'edit' : 'reply'](this.data).catch(lodash.noop);
+                data = await ins[this.replyType == 'edit' ? 'edit' : 'reply'](this.data as any).catch(lodash.noop);
             } else if (ins instanceof User || ins instanceof GuildMember || ins instanceof TextChannel) {
                 data = await ins
-                    .send(this.data)
+                    .send(this.data as any)
                     .catch(lodash.noop);
             };
             reset && this.reset()

@@ -1,8 +1,5 @@
 import { FunctionBuilder } from "../../classes/builder";
 import { SourceFunction, Data } from "../../../index";
-// import { Utils } from "../../classes/utils";
-// import lodash from "lodash";
-// import Hjson from "hjson";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -15,12 +12,10 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$yield[hi]')
         .setValue('returns', 'Void'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let p = d.metadata?.parent?.id as string || "global";
-        d.metadata.yields[p] = d.func.inside?.unescape();
-        return {
-            code: d.code?.replace(d.func.id, d.metadata.yields[p])
-        };
+    code: async function (d: Data) {
+        await this.resolveFields()
+        let parent = this.meta?.parent?.id as string || "global"
+        this.meta.yields[parent] = this.inside?.unescape()
+        return this.makeReturn(this.meta.yields[parent])
     }
 }

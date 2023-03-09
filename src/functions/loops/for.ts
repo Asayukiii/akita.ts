@@ -34,23 +34,21 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$for[0;$var[index]<100;default;$log[;INDEX NUMBER $var[index]]]')
         .setValue('returns', 'Void'),
-    code: async (d: Data) => {
-        await d.func.resolve_field(d, 0);
-        let [start] = d.interpreter.fields(d);
-        await d.interpreter._(d.func);
-        let [condition, iterator, code] = d.interpreter.fields(d, 1);
-        async function checkDefault() {
-            iterator == "default"
-                ? d.metadata.vars.index++ : iterator == "default2"
-                    ? d.metadata.vars.index-- : await Iterator(d, iterator);
+    code: async function () {
+        await this.resolveFields(0)
+        let start = this.fields.shift()
+        await this.fields.unsolve()
+        let [condition, iterator, code] = this.fields.split(true)
+        const checkDefault = async () => {
+            iterator === "increment" || iterator === "default"
+                ? this.meta.vars.index++ : iterator === "decrement"
+                    ? this.meta.vars.index-- : await Iterator(this.data, iterator);
         };
-        for (d.metadata.vars.index = Number(start); await Condition(d, condition); checkDefault()) {
-            let r = await d.interpreter.parse(code, d, d.client);
-            lodash.merge(d, r);
+        for (this.meta.vars.index = Number(start); await Condition(this.data, condition); checkDefault()) {
+            let r = await this.data.interpreter.parse(code, this.data, this.data.client);
+            lodash.merge(this.data, r);
         };
-        d.break = false;
-        return {
-            code: d.code?.replace(d.func.id, d.metadata.yields[d.func.id] || "")
-        };
+        this.data.break = false;
+        return this.makeReturn(this.meta.yields[this.id] || "")
     }
 }

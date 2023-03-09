@@ -20,16 +20,14 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$if[$author[username]==Pavez;Hi best developer;Hi... shitty person]')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        await d.func?.resolve_field(d, 0);
-        let f = d.func.fields?.shift();
-        await d.interpreter._(d.func);
-        let code = d.func.fields?.at(Utils.condition(f?.value!) ? 0 : 1)?.value?.trim()!;
-        let result = await d.interpreter.parse(code, d, d.client);
-        d.break = !!result?.break;
-        d.metadata = result?.metadata || d.metadata;
-        return {
-            code: d.code.replace(d.func.id, result?.code || "")
-        };
+    code: async function (d: Data) {
+        await this.resolveFields(0)
+        const condition = this.fields.shift() as string
+        await this.fields.unsolve()
+        let code = this.fields.get(Utils.condition(condition) ? 0 : 1, "").trim()
+        let result = await this.data.interpreter.parse(code, this.data, this.data.client)
+        this.meta.break = Boolean(result?.break)
+        this.meta = result?.metadata || this.meta.metadata
+        return this.makeReturn(this.meta.yields[this.id])
     }
 }

@@ -1,28 +1,35 @@
-import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-import "colors";
+import { FunctionBuilder } from "../../classes/builder"
+import { SourceFunction, Data } from "../../../index"
+import { invoke, has } from "lodash"
+import colors from "colors"
+let reg = /{(.*?)}/g
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
         .setName('log')
         .setValue('description', 'log something in console')
-        .setValue('use', '$log[title;...stuffs]')
+        .setValue('use', '$log[message]')
         .setValue('fields', [{
-            name: 'title',
+            name: 'message',
             type: 'string',
             optional: true
-        }, {
-            name: '...stuffs',
-            type: 'any'
         }])
-        .setValue('example', '$log[;hi]')
+        .setValue('example', '$log[{red:wuuuujuuuuuuuuuuuuuuu} {gray:chchchachchchch}]')
         .setValue('returns', 'Void'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let [name, ...idk] = d.interpreter.fields(d);
-        console.log((name || "INFO").bgBlue, "->".gray, ...idk.map(a => a.gray))
-        return {
-            code: d.code.replace(d.func?.id!, '')
-        };
+    code: async function () {
+        await this.resolveFields()
+        let msg = this.inside!.unescape(),
+            cosa = Array.from(msg.matchAll(reg)).reverse()
+        if (cosa.length > 0) {
+            for (const [total, inside] of cosa) {
+                const [key, ...txts] = inside.split(":")
+                if (has(colors, key)) {
+                    const txt = invoke(colors, key, txts.join(":")) + colors.reset("")
+                    msg = msg.replaceLast(total, txt)
+                }
+            }
+        }
+        console.log(msg)
+        return this.makeReturn("")
     }
 }

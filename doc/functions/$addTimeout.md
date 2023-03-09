@@ -1,5 +1,5 @@
 # **$addTimeout**
-> **...** <br/>
+> **Add a new timeout** <br/>
 > $addTimeout[time;id;data;code]
 - - -
 

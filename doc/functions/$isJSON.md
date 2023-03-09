@@ -6,8 +6,8 @@
 ### Fields
 | name | description | type | required |
 |------|-------------|------|----------|
-| Object | Unknown | Object&lt;T&lt;hjson&gt; ? HJSONEncodable : JSONEncodable&gt; | True |
-| Hjson | Unknown | Boolean | False |
+| Object | The object to validate | HJSONEncodable &#124; JSONEncodable | True |
+| Hjson | Whether or not to use HJson | Boolean | False |
 
 ### Returns
 > Unknown

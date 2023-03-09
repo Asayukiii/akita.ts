@@ -1,18 +1,17 @@
 # **$log**
 > **Log something in console** <br/>
-> $log[title;...stuffs]
+> $log[message]
 - - -
 
 ### Fields
 | name | description | type | required |
 |------|-------------|------|----------|
-| Title | Unknown | String | False |
-| ...stuffs | Unknown | Any | True |
+| Message | Unknown | String | False |
 
 ### Returns
 > Void
 
 ### Example
 > ```php
-$log[;hi]
+$log[{red:wuuuujuuuuuuuuuuuuuuu} {gray:chchchachchchch}]
 ```

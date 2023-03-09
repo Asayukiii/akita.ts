@@ -13,10 +13,17 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$js[process.exit()] // well... dont execute this xd')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        d.func.resolve_fields(d);
-        return {
-            code: d.code.replace(d.func.id, inspect(eval(d.interpreter.fields(d).join(";")), { depth: Infinity }))
-        };
+    code: async function () {
+        await this.resolveFields()
+        let result = "undefined"
+        try {
+            result = await eval(this.inside?.unescape()!)
+        } catch (error) {
+            this.data.client.emit("functionError", error, this.data)
+        }
+        return this.makeReturn(result)
+        // return {
+        //     code: d.code.replace(d.func.id, inspect(eval(d.interpreter.fields(d).join(";")), { depth: Infinity }))
+        // };
     }
 };

@@ -1,6 +1,6 @@
-import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-import * as math from 'math-expression-evaluator';
+import { FunctionBuilder } from "../../classes/builder"
+import * as math from "math-expression-evaluator"
+import { SourceFunction } from "../../../index"
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -13,10 +13,8 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$math[1+1] // i dont know, its very complex!')
         .setValue('returns', 'Number'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        return {
-            code: d.code.replace(d.func.id, String(math.eval(d.func.inside?.unescape())))
-        };
+    code: async function () {
+        await this.resolveFields()
+        return this.makeReturn(String(math.eval(this.inside?.unescape())))
     }
 };

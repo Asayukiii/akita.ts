@@ -1,6 +1,6 @@
 # **$call**
 > **...** <br/>
-> $callback[name;...params]
+> $call[name;...params]
 - - -
 
 ### Fields
@@ -14,6 +14,6 @@
 
 ### Example
 > ```php
-// client.addCallback("test", "$log[TEST;hi $1!!]")
-$call[test;Pavez] // TEST ;; hi Pavez!!
+// client.addCallback("test", "$log[hi $1!!]")
+$call[test;Pavez] // hi Pavez!!
 ```

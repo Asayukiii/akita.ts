@@ -1,7 +1,6 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-import { Utils } from "../../classes/utils";
-import lodash from "lodash";
+import { get, isNumber, set, toLower } from "lodash";
+import { SourceFunction } from "../../../index";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -16,17 +15,15 @@ export const data: SourceFunction = {
             type: '"prefix" | "postfix"',
             optional: true
         }])
-        .setValue('example', '$var[index;4] $var[xedni;8]\n$increment[index] // increments and return 5\n$increment[xedni;postfix] // increments and return 8')
+        .setValue('example', '$var[a;4] $var[b;8]\n$increment[a] // increments and return 5\n$increment[b;postfix] // increments and return 8')
         .setValue('returns', 'Number'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let [key, from = "prefix"] = d.interpreter.fields(d) as [string, "prefix" | "postfix"],
-            value = lodash.get(d.metadata.vars, key);
-        if (!["bigint", "number"].includes(typeof value)) return Utils.Warn(`variable ${key.bgYellow} is not numeric`, d);
-        if (!["prefix", "postfix"].includes(from)) return Utils.Warn(`invalid type`, d);
-        lodash.set(d.metadata.vars, key, ++value);
-        return {
-            code: d.code?.replace(d.func.id, lodash.toLower(from) == "prefix" ? value : --value)
-        };
+    code: async function () {
+        await this.resolveFields()
+        let [key, type = "prefix"] = this.fields.split(true) as string[],
+            value = await get(this.meta.vars, key)
+        if (!isNumber(value)) this.warn(`variable ${key.bgYellow} is not numeric`)
+        if ((type = toLower(type)) !== "prefix" && type !== "postfix") this.warn("invalid type provided")
+        set(this.meta.vars, key, ++value)
+        return this.makeReturn(type === "prefix" ? value : value - 1)
     }
 }

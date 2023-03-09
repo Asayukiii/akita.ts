@@ -1,8 +1,6 @@
-import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
-import { Utils } from "../../classes/utils";
-// import lodash from "lodash";
-// import Hjson from "hjson";
+import { FunctionBuilder } from "../../classes/builder"
+import { SourceFunction, Data } from "../../../index"
+import { Utils } from "../../classes/utils"
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -15,10 +13,8 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$or[0;false;hi;undefined] // hi\n$or[0;false;undefined] // no return')
         .setValue('returns', 'Any'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        return {
-            code: d.code?.replace(d.func.id, d.interpreter.fields(d).find((a) => !Utils.falsys.includes(a)) || "")
-        };
+    code: async function (d: Data) {
+        await this.resolveFields()
+        return this.makeReturn(this.fields.split(true).find(a => !Utils.falsys.includes(a)) || "")
     }
 }

@@ -1,5 +1,5 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
@@ -14,8 +14,8 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$c[$break is a util function]')
         .setValue('returns', 'Void'),
-    code: async (d: Data) => {
-        /* wtf r u doing reviewing the code? here, the lyrics of Mind Over Time (stop read my code)
+    code: async function () {
+        /* wtf r u doing reviewing the code? here, the lyrics of Mind Over Time (stop read my code!)
            I will still be up by fall
            I'll still be up by fall either way
            Still be up by fall
@@ -48,8 +48,6 @@ export const data: SourceFunction = {
            Mind over time
            It's mind over time
            It's your mind over time */
-        return {
-            code: d.code.replace(d.func.id, "")
-        };
+        return this.makeReturn("")
     }
 }

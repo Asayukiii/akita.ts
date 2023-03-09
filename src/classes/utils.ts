@@ -94,15 +94,15 @@ export const Utils = {
     Warn(error: string, d: Data, fatal: boolean = false): void {
         d.code &&= d.code.replace(d.func.id, " ");
         if (fatal) {
-            console.error(`${"ERROR".bgRed} ;; ${error.gray} in ${d.func.total.trim().bgRed}`.gray);
+            console.error(`${"ERROR".bgRed} -> ${error.gray} ${"in".gray} ${d.func.total.trim().bgRed}`.gray);
             d.break = true;
-        } else console.log(`${"WARN".bgYellow} ;; ${error.gray} in ${d.func.total.trim().bgYellow}`.gray);
+        } else console.log(`${"WARN".bgYellow} -> ${error.gray} ${"in".gray} ${d.func.total.trim().bgYellow}`.gray);
     },
     booleanify(str: string): boolean {
         let nyumber = Number(str);
         return isNaN(nyumber) ? nyumber > 0 : !this.falsys.includes(str?.toLowerCase());
     },
-    condition<T = null>(condition: string): boolean | null {
+    condition(condition: string): boolean | null {
         try {
             let ands = condition.split('&&')
             let results: any = []

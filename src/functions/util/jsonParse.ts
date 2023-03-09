@@ -13,11 +13,8 @@ export const data: SourceFunction = {
         }])
         .setValue('example', 'None')
         .setValue('returns', 'Any'),
-    code: async (d: Data) => {
-        await d.func.resolve_fields(d);
-        let [value] = d.interpreter.fields(d);
-        return {
-            code: d.code?.replace(d.func.id, JSON.stringify(Utils.Object(value)))
-        };
+    code: async function () {
+        await this.resolveFields()
+        return this.makeReturn(JSON.stringify(Utils.Object(this.inside!)))
     }
 }

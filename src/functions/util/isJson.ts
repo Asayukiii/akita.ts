@@ -1,5 +1,5 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 import { Utils } from "../../classes/utils";
 import Hjson from "hjson";
 
@@ -10,26 +10,24 @@ export const data: SourceFunction = {
         .setValue('use', '$isJSON[object;hjson?]')
         .setValue('fields', [{
             name: 'object',
-            type: 'object<T<hjson> ? HJSONEncodable : JSONEncodable>'
+            description: 'the object to validate',
+            type: 'HJSONEncodable | JSONEncodable'
         }, {
             name: 'hjson',
+            description: 'whether or not to use HJson',
             type: 'boolean',
             optional: true
         }])
         .setValue('example', 'None')
         .setValue('returns', 'Unknown'),
-    code: async (d: Data) => {
-        d.func.resolve_fields(d);
-        let [ object, hjson = "true" ] = d.interpreter.fields(d);
+    code: async function () {
+        await this.resolveFields()
+        let [object, hjson = "true"] = this.fields.split(true) as string[]
         try {
             Utils.booleanify(hjson) ? Hjson.parse(object) : JSON.parse(object);
-            return {
-                code: d.code.replace(d.func.id, "true")
-            };
-        } catch (error) {
-            return {
-                code: d.code.replace(d.func.id, "false")
-            };
+            return this.makeReturn("true")
+        } catch {
+            return this.makeReturn("false")
         }
     }
 }

@@ -14,7 +14,7 @@
 
 ### Example
 > ```php
-$var[index;4] $var[xedni;8]
-$increment[index] // increments and return 5
-$increment[xedni;postfix] // increments and return 8
+$var[a;4] $var[b;8]
+$increment[a] // increments and return 5
+$increment[b;postfix] // increments and return 8
 ```

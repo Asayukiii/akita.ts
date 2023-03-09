@@ -24,7 +24,7 @@ export class AkitaClient extends Client {
         });
         this.timeouts.start();
         this.on("ready", (t) => {
-            this.interpreter.parse("$log[DEBUG;Bot Ready as $data[client;user;tag]!!]", undefined, t as AkitaClient);
+            console.log(`${"DEBUG".bgBlue} ${"-> Bot ready as".gray} ${(t.user?.tag || "unknown#0000").bgBlue}`)
             setTimeout(() => this.isReady() || console.log("CLIENT CAN NOT START!".bgRed), 1e4);
         });
         this.on("functionError", (error: Error, d: Data) => {

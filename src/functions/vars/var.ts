@@ -1,10 +1,8 @@
 import { FunctionBuilder } from "../../classes/builder";
 import { Utils } from "../../classes/utils";
-import { SourceFunction, Data } from "../../../index";
-import { inspect } from "util";
-import lodash from "lodash";
-import Hjson from "hjson";
+import { SourceFunction } from "../../../index";
 import { That } from "src/classes/data";
+import Hjson from "hjson";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()

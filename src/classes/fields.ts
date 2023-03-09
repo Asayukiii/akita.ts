@@ -9,7 +9,7 @@ export class Fields {
     private options: Options
     private data: Data
     public fields: any[] = []
-    constructor (data: Data, options: Options = { limit: undefined }) {
+    constructor(data: Data, options: Options = { limit: undefined }) {
         this.options = options
         this.data = data
         const fields = data.func.fields?.map(f => f.value) || []
@@ -55,6 +55,21 @@ export class Fields {
      */
     public resolve(start: number | undefined = 0, end: number | undefined = this.fields.length): (string | number | bigint | object | RegExp)[] {
         return this.fields = Utils.Types(this.data, this.fields.slice(start, end) as string[])
+    }
+    /**
+     * unsolves the fields
+     */
+    public async unsolve(start: number | undefined = 0, end: number = this.fields.length) {
+        if (this.fields) {
+            for (let index = start; index < end; index++) {
+                for (let over of this.fields[index].overs) {
+                    await this.unsolve(over);
+                    this.data.func.fields![index].value = this.data.func.fields![index]?.value?.replaceAll(over.id, over.total)
+                    this.data.func.inside = this.data.func.inside!?.replaceAll(over.id, over.total)
+                    this.data.func.total = this.data.func.total.replaceAll(over.id, over.total)
+                }
+            }
+        }
     }
     /**
      * returns the fields

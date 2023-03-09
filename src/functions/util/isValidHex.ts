@@ -1,5 +1,5 @@
 import { FunctionBuilder } from "../../classes/builder";
-import { SourceFunction, Data } from "../../../index";
+import { SourceFunction } from "../../../index";
 import { Utils } from "../../classes/utils";
 
 export const data: SourceFunction = {
@@ -13,11 +13,8 @@ export const data: SourceFunction = {
         }])
         .setValue('example', '$isValidHex[#124f09] // true')
         .setValue('returns', 'Boolean'),
-    code: async (d: Data) => {
-        d.func = await d.func.resolve_fields(d);
-        let [hex] = d.interpreter.fields(d);
-        return {
-            code: d.code?.replace(d.func.id, Utils.ValidateHex(hex))
-        };
+    code: async function () {
+        await this.resolveFields()
+        return this.makeReturn(Utils.ValidateHex(this.inside!))
     }
 }
