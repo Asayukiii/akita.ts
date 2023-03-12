@@ -25,7 +25,7 @@ export const data: SourceFunction = {
         let [string, target, position] = this.fields.split(true) as [string, string, number]
         if (string.startsWith("var:")) {
             string = string.slice(4)
-            let value = this.variable(string)
+            const value = this.variable(string)
             if (typeof value !== "string") return this.warn(`Variable ${string.bgYellow} is not a string`)
             return this.makeReturn(this.setVariable(string, endsWith(string, target, Number(position) || 0)))
         }

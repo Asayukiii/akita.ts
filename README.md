@@ -5,21 +5,13 @@
 
 - - -
 
-<!-- # What's new?
-- Added $user
-- Added $warp
-- Added $isValidHex
-- Minor fixes
-
-- - - -->
-
 ```js
 // import { AkitaClient } from "akita.ts";
-var { AkitaClient } = require("akita.ts"),
-    client = new AkitaClient({
+var { AkitaClient } = require("akita.ts")
+var client = new AkitaClient({
         intents: [1, 2, 512, 32768] /* example discord intents */
-    }, "BOT_PREFIX");
-client.onMessageCreate();
+    }, "BOT_PREFIX")
+client.onMessageCreate()
 client.addCommand({
     names: ["test"],
     type: "MESSAGE",
@@ -27,9 +19,14 @@ client.addCommand({
     $setContent[Hi $author[username]!]
     $send[no]
     `
-});
-client.login("YOUR_BOT_TOKEN");
+})
+client.login("YOUR_BOT_TOKEN")
 ```
+
+- - -
+
+### [support server](https://discord.gg/JHVRk35nEb)
+### [documentation](https://akita.pavez.ml/#/)
 
 - - -
 
@@ -43,12 +40,12 @@ client.interpreter.addFunction({
         .setValue('description', 'THE FUNCTION DESCRIPTION') // "makes something"
         .setValue('use', 'AN EXAMPLE OF USE') // "$myFunc[arg1;arg2;...rest]"
         .setValue('returns', 'TYPE'), // "String"
-    code: async function () => {
+    code: async function (/* this: That */) => {
         // This will allow the inside of $myFunc to be executed!
         // await this.resolveFields()
 
         // This execute an especific field of $myFunc
-        // await this.resolveFields(index, end?);
+        // await this.resolveFields(index, end?)
         return this.makeReturn(/* result value here */)
     }
 });

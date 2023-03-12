@@ -6,19 +6,19 @@ import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('user')
-        .setValue('description', 'find a user and get properties')
-        .setValue('use', '$user[resolvable;properties?]')
-        .setValue('fields', [{
-            name: 'resolvable',
-            type: 'string',
+        .setName("user")
+        .setValue("description", "find a user and get properties")
+        .setValue("use", "$user[resolvable;properties?]")
+        .setValue("fields", [{
+            name: "resolvable",
+            type: "string",
         }, {
-            name: 'properties',
-            type: 'string',
+            name: "properties",
+            type: "string",
             optional: true
         }])
-        .setValue('example', '$user[Pavez#1995;id]')
-        .setValue('returns', 'Unknown'),
+        .setValue("example", "$user[Pavez#1995;id]")
+        .setValue("returns", "Unknown"),
     code: async function (this: That) {
         await this.resolveFields()
         let [resolvable, ...properties] = this.fields.split(true) as string[],

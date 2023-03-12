@@ -1,55 +1,38 @@
-import { FunctionBuilder } from "../../classes/builder";
-import { Utils } from "../../classes/utils";
-import { SourceFunction } from "../../../index";
-import { That } from "src/classes/data";
-import Hjson from "hjson";
+import { FunctionBuilder } from "../../classes/builder"
+import { SourceFunction } from "../../../index"
+import { Utils } from "../../classes/utils"
+import { isNil } from "lodash"
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('var')
-        .setValue('description', 'add or get a variable')
-        .setValue('use', '$var[key;value?;type?]')
-        .setValue('fields', [{
-            name: 'key',
-            description: 'property to get/set',
-            type: 'string',
+        .setName("var")
+        .setValue("description", "add or get a variable")
+        .setValue("use", "$var[key;value?;type?]")
+        .setValue("fields", [{
+            name: "key",
+            description: "property to get/set",
+            type: "string",
         }, {
-            name: 'value',
-            description: 'the value to be given to the variable',
-            type: 'any',
+            name: "value",
+            description: "the value to be given to the variable",
+            type: "any",
         }, {
-            name: 'type',
-            description: 'the variable force type `(default: unknown)`',
-            type: '"unknown" | "string" | "number" | "bigint" | "regexp" | "json"',
+            name: "type",
+            description: "the variable force type `(default: unknown)`",
+            type: "\"unknown\" | \"string\" | \"number\" | \"bigint\" | \"regexp\" | \"json\"",
         }])
-        .setValue('example', '$var[str;hi, im a string] // string var\n$var[num;4] // number var\n$var[obj;{ "leif": "erikson" }] // object var')
-        .setValue('returns', 'String'),
-    code: async function (this: That) {
+        .setValue("example", "$var[str;hi, im a string] // string var\n$var[num;4] // number var\n$var[obj;{ \"leif\": \"erikson\" }] // object var")
+        .setValue("returns", "String"),
+    code: async function () {
         await this.resolveFields()
-        let fields = this.fields.split(true) as [string, any, string],
-            [key, value, type = "unknown"] = fields;
+        const fields = this.fields.split(true) as [string, unknown]
+        // eslint-disable-next-line prefer-const
+        let [key, value] = fields
         if (key.startsWith("invoke:")) {
-            value = await Utils.Invoke(this, key, fields.slice(1), this.data.metadata.vars);
+            value = await Utils.Invoke(this, key, fields.slice(1) as string[], this.meta)
             return this.makeReturn(value)
         }
-        if (value) {
-            type = type.toLowerCase();
-            if (type == "number" || type != "string" && type != "bigint" && !isNaN(value))
-                value = Number(value);
-            else if (type == "bigint" || type != "string" && type != "number" && !isNaN(value))
-                value = BigInt(value);
-            else if (type == "regexp" || type != "string" && ["unknown", "regexp"].includes(type) && /\/(.*?)\/(.+|)/g.test(value)) {
-                let splitted = value.split("/");
-                value = new RegExp(splitted[1], splitted[2]);
-            } else if (["json", "unknown"].includes(type))
-                try {
-                    value = Hjson.parse(value);
-                } catch (e) {
-                    if (type == "json")
-                        return this.warn("Invalid JSON provided")
-                }
-            this.setVariable(key, value)
-        }
+        isNil(value) || this.setVariable(key, Utils.Types(this.data, [value] as string[]))
         return this.makeReturn(this.variable(key))
     }
 }

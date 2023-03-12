@@ -4,15 +4,15 @@ import { round, set, get } from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('round')
-        .setValue('description', 'lodash.round method')
-        .setValue('use', '$round[integer]')
-        .setValue('fields', [{
-            name: 'integer',
-            type: 'number'
+        .setName("round")
+        .setValue("description", "lodash.round method")
+        .setValue("use", "$round[integer]")
+        .setValue("fields", [{
+            name: "integer",
+            type: "number"
         }])
-        .setValue('example', '$round[3.5] // returns 3')
-        .setValue('returns', 'Number'),
+        .setValue("example", "$round[3.5] // returns 3")
+        .setValue("returns", "Number"),
     code: async function () {
         await this.resolveFields()
         if ((this.inside = this.inside?.unescape()!).startsWith("var:")) {

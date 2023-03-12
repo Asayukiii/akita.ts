@@ -6,21 +6,21 @@ import lodash from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('addTimeout')
-        .setValue('description', 'Add a new timeout')
-        .setValue('use', '$addTimeout[time;id;data;code]')
-        .setValue('fields', [{
-            name: 'time',
-            type: 'time'
+        .setName("addTimeout")
+        .setValue("description", "Add a new timeout")
+        .setValue("use", "$addTimeout[time;id;data;code]")
+        .setValue("fields", [{
+            name: "time",
+            type: "time"
         }, {
-            name: 'id',
-            type: 'string | "random"'
+            name: "id",
+            type: "string | \"random\""
         }, {
-            name: 'code',
-            type: 'string<interpretableCode>'
+            name: "code",
+            type: "string<interpretableCode>"
         }])
-        .setValue('example', '$addTimeout[5s;asdf;$log[TIMEOUT;hi!]]')
-        .setValue('returns', 'Void'),
+        .setValue("example", "$addTimeout[5s;asdf;$log[TIMEOUT;hi!]]")
+        .setValue("returns", "Void"),
     code: async function () {
         await this.resolveFields()
         let [time, id, data] = this.fields.split(true) as [number, string, Record<string, any> | null]

@@ -6,17 +6,17 @@ import { get } from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('author')
-        .setValue('description', 'get author data')
-        .setValue('use', '$author[key?]')
-        .setValue('fields', [{
-            name: 'key',
-            description: '',
-            type: 'string',
+        .setName("author")
+        .setValue("description", "get author data")
+        .setValue("use", "$author[key?]")
+        .setValue("fields", [{
+            name: "key",
+            description: "",
+            type: "string",
             optional: true
         }])
-        .setValue('example', '$author[id]\n\n// using funcs\n$author[invoke:displayAvatarURL->avatar;{ size: 2048 }]')
-        .setValue('returns', 'Unknown'),
+        .setValue("example", "$author[id]\n\n// using funcs\n$author[invoke:displayAvatarURL->avatar;{ size: 2048 }]")
+        .setValue("returns", "Unknown"),
     code: async function (this: That) {
         await this.resolveFields()
         let fields = this.fields.split(true),

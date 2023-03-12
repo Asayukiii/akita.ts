@@ -25,8 +25,8 @@ export class Fields {
      * @param {boolean} resolve whether or not to resolve the type
      * @returns the last field
      */
-    public pop(resolve: boolean = false) {
-        let that = this.fields.pop();
+    public pop(resolve = false) {
+        const that = this.fields.pop();
         return resolve ? Utils.Types(this.data, [that] as string[]) : that
     }
     /**
@@ -34,8 +34,8 @@ export class Fields {
      * @param {boolean} resolve whether or not to resolve the type
      * @returns the first field
      */
-    public shift(resolve: boolean = false) {
-        let that = this.fields.shift().unescape()
+    public shift(resolve = false) {
+        const that = this.fields.shift().unescape()
         return resolve ? Utils.Types(this.data, [that] as string[]) : that
     }
     /**
@@ -44,7 +44,7 @@ export class Fields {
      * @param {any} def the default value
      * @returns field value or default value
      */
-    public get(index: number = 0, def: any = null): any {
+    public get(index = 0, def: any = null): any {
         return this.data.func.fields?.at(index)?.value ?? def
     }
     /**
@@ -62,10 +62,10 @@ export class Fields {
     public async unsolve(start: number | undefined = 0, end: number = this.fields.length) {
         if (this.fields) {
             for (let index = start; index < end; index++) {
-                for (let over of this.fields[index].overs) {
+                for (const over of this.fields[index].overs) {
                     await this.unsolve(over);
                     this.data.func.fields![index].value = this.data.func.fields![index]?.value?.replaceAll(over.id, over.total)
-                    this.data.func.inside = this.data.func.inside!?.replaceAll(over.id, over.total)
+                    this.data.func.inside = this.data.func.inside?.replaceAll(over.id, over.total)
                     this.data.func.total = this.data.func.total.replaceAll(over.id, over.total)
                 }
             }
@@ -78,9 +78,9 @@ export class Fields {
      * @param {number | undefined} end  where end
      * @returns (string | number | bigint | object | RegExp)[]
      */
-    public split(unescape: boolean = true, start: number | undefined = 0, end: number | undefined = this.fields.length): any[] {
+    public split(unescape = true, start: number | undefined = 0, end: number | undefined = this.fields.length): any[] {
         return this.fields.slice(start, end).map(f => {
             return unescape && typeof f === "string" ? f.unescape() : f
         })
     }
-};
+}

@@ -20,7 +20,7 @@ export class That {
      * @param {boolean} fatal if this warning will be fatal
      * @returns void
      */
-    public warn(msg: string, fatal: boolean = false): void {
+    public warn(msg: string, fatal = false): void {
         Utils.Warn(msg, this.data, fatal)
     }
     /**

@@ -7,16 +7,16 @@ import { inspect } from "util";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('ctx')
-        .setValue('description', 'get context data')
-        .setValue('use', '$ctx[key?]')
-        .setValue('fields', [{
-            name: 'key',
-            type: 'string',
+        .setName("ctx")
+        .setValue("description", "get context data")
+        .setValue("use", "$ctx[key?]")
+        .setValue("fields", [{
+            name: "key",
+            type: "string",
             optional: true
         }])
-        .setValue('example', '$ctx[data.guild;id]')
-        .setValue('returns', 'Unknown'),
+        .setValue("example", "$ctx[data.guild;id]")
+        .setValue("returns", "Unknown"),
     code: async function (this: That) {
         await this.resolveFields()
         let fields = this.fields.split(true) as string[], result = "undefined"

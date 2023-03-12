@@ -4,18 +4,18 @@ import { Utils } from "../../classes/utils"
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('appCmd')
-        .setValue('description', '...')
-        .setValue('use', '$appCmd[method;...params?]')
-        .setValue('fields', [{
-            name: 'method',
-            type: '"create" | "edit" | "delete"',
+        .setName("appCmd")
+        .setValue("description", "...")
+        .setValue("use", "$appCmd[method;...params?]")
+        .setValue("fields", [{
+            name: "method",
+            type: "\"create\" | \"edit\" | \"delete\"",
         }, {
-            name: '...params',
-            type: '[object<applicationCommandData>, guildId?] | [applicationCommandResolvable, object<applicationCommandData>, guildId?] | [applicationCommandResolvable, object<applicationCommandData>]'
+            name: "...params",
+            type: "[object<applicationCommandData>, guildId?] | [applicationCommandResolvable, object<applicationCommandData>, guildId?] | [applicationCommandResolvable, object<applicationCommandData>]"
         }])
-        .setValue('example', 'None')
-        .setValue('returns', 'Unknown'),
+        .setValue("example", "None")
+        .setValue("returns", "Unknown"),
     code: async function (d: Data) {
         await this.resolveFields()
         let [method, ...params] = this.fields.split(true) as string[], result: unknown = "undefined"

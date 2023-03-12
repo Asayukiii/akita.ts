@@ -5,26 +5,26 @@ import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('ban')
-        .setValue('description', 'bans a user')
-        .setValue('use', '$ban[user;options?;guild?]')
-        .setValue('fields', [{
-            name: 'user',
-            description: 'the user Id that will be banned',
-            type: 'snowflake<user>'
+        .setName("ban")
+        .setValue("description", "bans a user")
+        .setValue("use", "$ban[user;options?;guild?]")
+        .setValue("fields", [{
+            name: "user",
+            description: "the user Id that will be banned",
+            type: "snowflake<user>"
         }, {
-            name: 'options',
-            description: 'ban options <small>see more [here](https://discord.js.org/#/docs/discord.js/main/typedef/BanOptions)<small> `(default: {})`',
-            type: 'HJSOEncodable',
+            name: "options",
+            description: "ban options <small>see more [here](https://discord.js.org/#/docs/discord.js/main/typedef/BanOptions)<small> `(default: {})`",
+            type: "HJSOEncodable",
             optional: true
         }, {
-            name: 'guild',
-            description: 'the guild Id where the action will take place `(default: ?ContextGuildId)`',
-            type: 'snowflake<guild>',
+            name: "guild",
+            description: "the guild Id where the action will take place `(default: ?ContextGuildId)`",
+            type: "snowflake<guild>",
             optional: true
         }])
-        .setValue('example', '$ban[$author[id];{ reason: "idk..." }]')
-        .setValue('returns', 'Boolean'),
+        .setValue("example", "$ban[$author[id];{ reason: \"idk...\" }]")
+        .setValue("returns", "Boolean"),
     code: async function (this: That) {
         await this.resolveFields()
         let [userId, opts = "{}", guildId = this.data.metadata?.ctx?.getGuild()?.id!] = this.fields.split(true) as [string, any, string]

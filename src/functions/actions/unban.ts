@@ -4,32 +4,32 @@ import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('unban')
-        .setValue('description', 'unbans a user')
-        .setValue('use', '$unban[user;reason?;guild?]')
-        .setValue('fields', [{
-            name: 'user',
-            description: 'the user Id that will be unbanned',
-            type: 'snowflake<user>'
+        .setName("unban")
+        .setValue("description", "unbans a user")
+        .setValue("use", "$unban[user;reason?;guild?]")
+        .setValue("fields", [{
+            name: "user",
+            description: "the user Id that will be unbanned",
+            type: "snowflake<user>"
         }, {
-            name: 'reason',
-            description: 'the "why" will be unbanned `(default: none)`',
-            type: 'string',
+            name: "reason",
+            description: "the \"why\" will be unbanned `(default: none)`",
+            type: "string",
             optional: true
         }, {
-            name: 'guild',
-            description: 'the guild Id where this action will take place `(defalut: ?ContextGuildId)`',
-            type: 'snowflake<guild>',
+            name: "guild",
+            description: "the guild Id where this action will take place `(defalut: ?ContextGuildId)`",
+            type: "snowflake<guild>",
             optional: true
         }])
-        .setValue('example', '$unban[772558414605844480;cuz is so hot]')
-        .setValue('returns', 'Boolean'),
+        .setValue("example", "$unban[772558414605844480;cuz is so hot]")
+        .setValue("returns", "Boolean"),
     code: async function (this: That) {
         await this.resolveFields()
-        let [userId, opts, guildId = this.data.metadata.ctx.getGuild()?.id!] = this.fields.split(true)
-        let guild = this.data.client.guilds.cache.get(guildId)
+        const [userId, opts, guildId = this.data.metadata.ctx.getGuild()?.id!] = this.fields.split(true)
+        const guild = this.data.client.guilds.cache.get(guildId)
         if (!guild) return this.warn("invalid guild id provided")
-        let result = await guild.bans.remove(userId, opts).catch(error => {
+        const result = await guild.bans.remove(userId, opts).catch(error => {
             this.warn(`failed to unban ${userId.bgYellow} because ${error.message?.bgYellow || error}`)
             return false
         })

@@ -5,10 +5,10 @@ import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('setFooter')
-        .setValue('description', 'sets the footer of this embed')
-        .setValue('use', '$setFooter[index;text;iconURL?]')
-        .setValue('fields', [{
+        .setName("setFooter")
+        .setValue("description", "sets the footer of this embed")
+        .setValue("use", "$setFooter[index;text;iconURL?]")
+        .setValue("fields", [{
             name: "index",
             description: "the index of the embed",
             type: "number[0,4]"
@@ -22,8 +22,8 @@ export const data: SourceFunction = {
             type: "string<URL>",
             optional: false
         }])
-        .setValue('example', '$setFooter[0;$author[tag];$author[displayAvatarURL]]')
-        .setValue('returns', 'Void'),
+        .setValue("example", "$setFooter[0;$author[tag];$author[displayAvatarURL]]")
+        .setValue("returns", "Void"),
     code: async function (this: That) {
         await this.resolveFields()
         let [index = 0, text, iconURL] = this.fields.split(true) as [number, string, string]

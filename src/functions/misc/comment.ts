@@ -3,17 +3,17 @@ import { SourceFunction } from "../../../index";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('c')
-        .setValue('description', 'add a comment on your code')
-        .setValue('use', '$c[comment]')
-        .setValue('fields', [{
-            name: 'comment',
-            description: 'the comment (this  will not be executed)',
-            type: 'string',
+        .setName("c")
+        .setValue("description", "add a comment on your code")
+        .setValue("use", "$c[comment]")
+        .setValue("fields", [{
+            name: "comment",
+            description: "the comment (this  will not be executed)",
+            type: "string",
             optional: true
         }])
-        .setValue('example', '$c[$break is a util function]')
-        .setValue('returns', 'Void'),
+        .setValue("example", "$c[$break is a util function]")
+        .setValue("returns", "Void"),
     code: async function () {
         /* wtf r u doing reviewing the code? here, the lyrics of Mind Over Time (stop read my code!)
            I will still be up by fall

@@ -4,19 +4,19 @@ import { SourceFunction } from "../../../index";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('decrement')
-        .setValue('description', 'decrements a numeric variable by 1')
-        .setValue('use', '$decrement[key;type?]')
-        .setValue('fields', [{
-            name: 'key',
-            type: 'string<variable>',
+        .setName("decrement")
+        .setValue("description", "decrements a numeric variable by 1")
+        .setValue("use", "$decrement[key;type?]")
+        .setValue("fields", [{
+            name: "key",
+            type: "string<variable>",
         }, {
             name: "type",
-            type: '"prefix" | "postfix"',
+            type: "\"prefix\" | \"postfix\"",
             optional: true
         }])
-        .setValue('example', '$var[a;4] $var[b;8]\n$decrement[a] // decrements and return 3\n$increment[b;postfix] // decrements and return 8')
-        .setValue('returns', 'Number'),
+        .setValue("example", "$var[a;4] $var[b;8]\n$decrement[a] // decrements and return 3\n$increment[b;postfix] // decrements and return 8")
+        .setValue("returns", "Number"),
     code: async function () {
         await this.resolveFields()
         let [key, type = "prefix"] = this.fields.split(true) as string[],

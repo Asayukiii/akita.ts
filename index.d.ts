@@ -1,16 +1,16 @@
-import type { Interpreter } from "./src/classes/interpreter";
-import type { Compiler, FnD } from "./src/classes/compiler";
-import type { Container } from "./src/classes/container";
-import { Application, Request, Response } from "express";
-import { FunctionBuilder } from "./src/classes/builder";
-import type { Context } from "./src/classes/context";
-import { AkitaClient } from "src/main";
-import { That } from "src/classes/data";
+import { Extra, FunctionBuilder } from "./src/classes/builder"
+import type { Interpreter } from "./src/classes/interpreter"
+import type { Compiler, FnD } from "./src/classes/compiler"
+import type { Container } from "./src/classes/container"
+import type { Context } from "./src/classes/context"
+import { Request, Response } from "express"
+import { That } from "src/classes/data"
+import { AkitaClient } from "src/main"
 
-export type Typeof = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "any";
+export type Typeof = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "any"
 export type CommandType = "MESSAGE" | "INTERACTION" | "MEMBER_ADD" | "MEMBER_REMOVE"
 export type Falsy = false | void | "" | 0 | null | undefined
-export type Truthy<T> = T extends Falsy ? never : T;
+export type Truthy<T> = T extends Falsy ? never : T
 
 export interface Command {
     names?: string[]
@@ -28,7 +28,7 @@ export interface Metadata extends Record<K, T> {
 export interface Data {
     interpreter: Interpreter
     client: AkitaClient
-    metadata: Metadata
+    metadata: Partial<Metadata>
     compiler: Compiler
     break: Falsy | Truthy
     code: string
@@ -37,7 +37,7 @@ export interface Data {
 
 export interface FunctionBuilderData {
     name: string,
-    extra?: Record<string, any>
+    extra?: Extra
 }
 
 export interface SourceFunction {
@@ -74,7 +74,7 @@ export const Utils = {
      * Resolve a condition inside a string.
      * @param condition The string conditional.
      */
-    condition(condition: string): boolean | null;
+    condition(condition: string): boolean | null
 }
 
 export default { FunctionBuilder, Utils, AkitaClient }
@@ -82,8 +82,8 @@ export default { FunctionBuilder, Utils, AkitaClient }
 declare global {
     interface String {
         replaceLast(pattern: string | RegExp, replacer?: string): string
-        asyncReplace(pattern: any, replacer?: any): Promise<string>
-        replace(searchValue: string | RegExp, replaceValue: any)
+        asyncReplace(pattern: string | RegExp, replacer?): Promise<string>
+        replace(searchValue: string | RegExp, replaceValue)
         unescape(): string 
         escape(): string
     }

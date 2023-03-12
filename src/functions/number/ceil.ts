@@ -4,15 +4,15 @@ import { set, ceil, get } from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('ceil')
-        .setValue('description', 'lodash.ceil method')
-        .setValue('use', '$ceil[integer]')
-        .setValue('fields', [{
-            name: 'integer',
-            type: 'number'
+        .setName("ceil")
+        .setValue("description", "lodash.ceil method")
+        .setValue("use", "$ceil[integer]")
+        .setValue("fields", [{
+            name: "integer",
+            type: "number"
         }])
-        .setValue('example', '$ceil[1.0000002] // returns 2')
-        .setValue('returns', 'Number'),
+        .setValue("example", "$ceil[1.0000002] // returns 2")
+        .setValue("returns", "Number"),
     code: async function () {
         await this.resolveFields()
         if ((this.inside = this.inside?.unescape()!).startsWith("var:")) {

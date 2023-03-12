@@ -30,22 +30,28 @@ import lodash from "lodash"
 
 // exports
 export class Container {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    public data: Partial<{ components: ActionRowBuilder[]; embeds: EmbedBuilder[]; content: string } | MessagePayloadOption> = {
-        fetchReply: false,
-        ephemeral: false,
-        attachments: undefined,
-        components: [] as ActionRowBuilder[],
-        content: undefined,
-        embeds: [] as EmbedBuilder[],
-        files: [] as any[]
-    };
+    public data: Partial<{
+        components: ActionRowBuilder[]
+        embeds: EmbedBuilder[]
+        ephemeral: boolean
+        content: string
+    } | MessagePayloadOption> = {
+            fetchReply: false,
+            ephemeral: false,
+            attachments: undefined,
+            components: [] as ActionRowBuilder[],
+            content: undefined,
+            embeds: [] as EmbedBuilder[],
+            files: [] as any[]
+        };
     public replyType = "send";
-    public instance: any = null;
-    constructor() { };
+    public instance: unknown = null;
+    constructor() { null }
     public reset() {
         this.data = new Container().data;
-    };
+    }
     public setInstance<T>(instance: T) {
         return (this.instance = instance), this
     }
@@ -54,7 +60,8 @@ export class Container {
         return this
     }
     public addRow(): this {
-        if (this.data.components ||= []) this.data.components.push((new ActionRowBuilder() as any))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((this.data.components ||= [])) this.data.components.push((new ActionRowBuilder() as any))
         return this
     }
     public addButton(data: Partial<ButtonComponentData> | Partial<APIButtonComponent> | undefined, index = -1): this {
@@ -93,24 +100,24 @@ export class Container {
     } = {}, reset = true): Promise<null | Message | InteractionResponse> {
         if (ins) {
             this.data.content = content;
-            var data = null as unknown
+            let data = null as unknown
             if (ins instanceof BaseInteraction) {
                 if (ins instanceof AutocompleteInteraction)
                     data = ins.respond([]).catch(lodash.noop);
                 else {
                     (this.replyType != "reply" && (this.replyType = "reply")),
-                        (ins.isRepliable() && ins.deferred && (this.replyType = 'editReply'));
-                };
+                        (ins.isRepliable() && ins.deferred && (this.replyType = "editReply"));
+                }
                 data = await ins[this.replyType]?.(this.data).catch(lodash.noop);
             } else if (ins instanceof Message) {
-                data = await ins[this.replyType == 'edit' ? 'edit' : 'reply'](this.data as any).catch(lodash.noop);
+                data = await ins[this.replyType == "edit" ? "edit" : "reply"](this.data as any).catch(lodash.noop);
             } else if (ins instanceof User || ins instanceof GuildMember || ins instanceof TextChannel) {
                 data = await ins
                     .send(this.data as any)
                     .catch(lodash.noop);
-            };
+            }
             reset && this.reset()
             return data as Message || null;
         } else return null;
-    };
-};
+    }
+}

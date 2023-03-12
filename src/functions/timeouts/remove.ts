@@ -3,15 +3,15 @@ import { SourceFunction } from "../../../index";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('removeTimeout')
-        .setValue('description', 'Remove and cancel a timeout')
-        .setValue('use', '$removeTimeout[time]')
-        .setValue('fields', [{
-            name: 'id',
-            type: 'string'
+        .setName("removeTimeout")
+        .setValue("description", "Remove and cancel a timeout")
+        .setValue("use", "$removeTimeout[time]")
+        .setValue("fields", [{
+            name: "id",
+            type: "string"
         }])
-        .setValue('example', '$removeTimeout[1223645]')
-        .setValue('returns', 'Void'),
+        .setValue("example", "$removeTimeout[1223645]")
+        .setValue("returns", "Void"),
     code: async function () {
         await this.resolveFields()
         let id = this.fields.shift() as string,

@@ -6,25 +6,25 @@ import { That } from "src/classes/data";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('member')
-        .setValue('description', 'find a member and get properties')
-        .setValue('use', '$member[guild;resolvable;properties?]')
-        .setValue('fields', [{
-            name: 'guild',
-            type: 'snowflake<guild>'
+        .setName("member")
+        .setValue("description", "find a member and get properties")
+        .setValue("use", "$member[guild;resolvable;properties?]")
+        .setValue("fields", [{
+            name: "guild",
+            type: "snowflake<guild>"
         }, {
-            name: 'resolvable',
-            type: 'string',
+            name: "resolvable",
+            type: "string",
         }, {
-            name: 'properties',
-            type: 'string',
+            name: "properties",
+            type: "string",
             optional: true
         }])
-        .setValue('example', '$member[Pavez;user;id]')
-        .setValue('returns', 'Unknown'),
+        .setValue("example", "$member[Pavez;user;id]")
+        .setValue("returns", "Unknown"),
     code: async function (this: That) {
         await this.resolveFields()
-        let [guildId = "self", resolvable, ...properties] = this.fields.split(true) as string[],
+        const [guildId = "self", resolvable, ...properties] = this.fields.split(true) as string[],
             guild = guildId.toLowerCase() === "self"
                 ? this.data.metadata.ctx.getGuild()
                 : this.data.client.guilds.cache.get(guildId);

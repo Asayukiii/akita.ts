@@ -4,16 +4,16 @@ import lodash from "lodash";
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('eval')
-        .setValue('description', 'evaluate code')
-        .setValue('use', '$eval[code]')
-        .setValue('fields', [{
-            name: 'code',
-            description: 'code to evaluate',
-            type: 'string<interpretableCode>'
+        .setName("eval")
+        .setValue("description", "evaluate code")
+        .setValue("use", "$eval[code]")
+        .setValue("fields", [{
+            name: "code",
+            description: "code to evaluate",
+            type: "string<interpretableCode>"
         }])
-        .setValue('example', '$eval[$yield[$args]]')
-        .setValue('returns', 'Unknown'),
+        .setValue("example", "$eval[$yield[$args]]")
+        .setValue("returns", "Unknown"),
     code: async function () {
         await this.resolveFields()
         await this.fields.unsolve()

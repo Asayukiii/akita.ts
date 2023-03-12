@@ -2,20 +2,20 @@ import { FunctionBuilder } from "../../classes/builder"
 import { SourceFunction, Data } from "../../../index"
 import { invoke, has } from "lodash"
 import colors from "colors"
-let reg = /{(.*?)}/g
+const reg = /{(.*?)}/g
 
 export const data: SourceFunction = {
     data: new FunctionBuilder()
-        .setName('log')
-        .setValue('description', 'log something in console')
-        .setValue('use', '$log[message]')
-        .setValue('fields', [{
-            name: 'message',
-            type: 'string',
+        .setName("log")
+        .setValue("description", "log something in console")
+        .setValue("use", "$log[message]")
+        .setValue("fields", [{
+            name: "message",
+            type: "string",
             optional: true
         }])
-        .setValue('example', '$log[{red:wuuuujuuuuuuuuuuuuuuu} {gray:chchchachchchch}]')
-        .setValue('returns', 'Void'),
+        .setValue("example", "$log[{red:wuuuujuuuuuuuuuuuuuuu} {gray:chchchachchchch}]")
+        .setValue("returns", "Void"),
     code: async function () {
         await this.resolveFields()
         let msg = this.inside!.unescape(),
