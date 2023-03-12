@@ -1,17 +1,17 @@
-# **$removeTimeout**
-> **Remove and cancel a timeout** <br/>
-> $removeTimeout[time]
+# **$ephemeral**
+> **Make ephemeral this instance** <br/>
+> $ephemeral[force?]
 - - -
 
 ### Fields
 | name | description | type | required |
 |------|-------------|------|----------|
-| Id | Unknown | String | True |
+| Force | The forced value | String | True |
 
 ### Returns
 > Void
 
 ### Example
 > ```php
-$removeTimeout[1223645]
+$ephemeral[true]
 ```

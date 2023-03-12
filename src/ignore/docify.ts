@@ -37,16 +37,16 @@ function docify(func: SourceFunction) {
     return str.join("\n")
 }
 
+
 void async function main() {
+    fs.writeFileSync(process.cwd() + "/doc/_sidebar.md", Object.keys(docs).map(a => `* [${a}](functions/${a}.md)`).join("\n"), "utf-8")
     for (const folder of fs.readdirSync(mod)) {
         for (const file of fs.readdirSync(`${mod}/${folder}/`)) {
             const r: SourceFunction | undefined = (await import(`../functions/${folder}/${file}`)).data
             if (r) {
                 docs[r.data.name] = docify(r);
-                fs.writeFileSync(process.cwd() + "/doc/functions/" + r?.data.name + ".md", docs[r.data.name], "utf-8");
+                fs.writeFileSync(process.cwd() + "/doc/functions/" + r?.data.name + ".md", docs[r.data.name], "utf-8")
             }
         }
     }
 }()
-
-fs.writeFileSync(process.cwd() + "/doc/_sidebar.md", Object.keys(docs).map(a => `* [${a}](functions/${a}.md)`).join("\n"), "utf-8");

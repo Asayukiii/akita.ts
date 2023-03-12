@@ -1,6 +1,6 @@
 # **$randomNumber**
 > **Produces a random number between min and max** <br/>
-> $random[min;max;decimals?]
+> $randomNumber[min;max;decimals?]
 - - -
 
 ### Fields

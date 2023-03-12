@@ -1,6 +1,6 @@
 # **$randomChoice**
 > **...** <br/>
-> $randomChoices[...choices]
+> $randomChoice[...choices]
 - - -
 
 ### Fields

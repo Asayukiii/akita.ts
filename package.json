@@ -1,6 +1,6 @@
 {
   "name": "akita.ts",
-  "version": "1.2.3-dev",
+  "version": "1.2.4-dev",
   "description": "...",
   "main": "dist/main.js",
   "types": "index.d.ts",

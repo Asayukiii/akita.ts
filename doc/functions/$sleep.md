@@ -1,17 +1,18 @@
-# **$removeTimeout**
-> **Remove and cancel a timeout** <br/>
-> $removeTimeout[time]
+# **$sleep**
+> **Sleep the execution** <br/>
+> $sleep[time]
 - - -
 
 ### Fields
 | name | description | type | required |
 |------|-------------|------|----------|
-| Id | Unknown | String | True |
+| Min | Unknown | Number | True |
+| Max | Unknown | Number | True |
 
 ### Returns
 > Void
 
 ### Example
 > ```php
-$removeTimeout[1223645]
+$sleep[20s]
 ```
